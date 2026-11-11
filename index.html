@@ -314,8 +314,13 @@ tr:last-child td{border-bottom:none}
   function renderOverview(list){
     var profs=state.sel?[prof(state.sel)].filter(Boolean):state.profs.slice().sort(function(a,b){return a.name.localeCompare(b.name)});
     if(!profs.length)return emptyState();
+    // With a filter on (Upcoming, Past, country or search), only show professors who have a matching entry.
+    // The card itself always summarises all of that professor's entries.
+    var filtering=state.when!=="all"||state.country||state.text;
+    if(filtering)profs=profs.filter(function(p){return list.some(function(a){return a.profId===p.id})});
+    if(!profs.length)return '<div class="note">No professors match these filters.</div>';
     return '<div class="overview">'+profs.map(function(p){
-      var mine=list.filter(function(a){return a.profId===p.id});
+      var mine=state.apps.filter(function(a){return a.profId===p.id});
       var ups=mine.filter(isUp).sort(function(a,b){return sortKey(a)<sortKey(b)?-1:1});
       var past=mine.filter(function(a){return status(a)==="past"}).sort(function(a,b){return sortKey(a)>sortKey(b)?-1:1});
       var places={};mine.forEach(function(a){var k=a.country||"Unknown";places[k]=(places[k]||0)+1});
