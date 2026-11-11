@@ -22,6 +22,7 @@ conferences:
     end: 2027-01-04
     city: ""
     country: "Location TBD"
+    enabled: false   # site blocks automated reads; already logged
     urls:
       - https://www.keystonesymposia.org/conferences/conference-listing/meeting/onpage-program/X22027
 
@@ -59,6 +60,7 @@ conferences:
     end: 2027-06-24
     city: Boston
     country: USA
+    enabled: false   # enable once the 2027 program/speakers page is posted, and swap in that URL
     urls:
       - https://www.americanpeptidesociety.org/   # replace with the program/speakers page when posted
 
@@ -68,6 +70,7 @@ conferences:
     end: ""
     city: ""
     country: ""
+    enabled: false   # /program page removed; add the PS41 URL when the site is up
     urls:
       - https://ps.memberclicks.net/program   # the society's current-program page; confirm it shows the 2027 meeting
 
@@ -138,6 +141,7 @@ conferences:
 prof_pages:
   - prof: hiroshi-murakami
     url: https://www.chembio.nagoya-u.ac.jp/labhp/bioanal2/en/presentations.html
+    enabled: false   # server refuses automated reads
   - prof: luke-lavis
     url: https://www.janelia.org/lab/lavis-lab/publications
   - prof: colin-jackson
