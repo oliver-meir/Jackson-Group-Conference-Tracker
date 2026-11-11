@@ -1,0 +1,147 @@
+# Pages the weekly check reads. Edit this file to add or retire conferences.
+#
+# For each conference:
+#   id:         short unique name, e.g. bps-2027 (used to avoid adding the same match twice)
+#   conference: the name shown on the website
+#   start/end:  YYYY-MM-DD if known (leave blank if not announced; the reviewer fills it in)
+#   city/country
+#   urls:       program, schedule or invited-speaker pages (HTML or PDF). Several are fine.
+#   enabled:    false to skip without deleting
+#   ignore:     [professor-id, ...] to stop re-suggesting a match you rejected
+#
+# Once a year: when a conference's next edition gets a website, copy its block,
+# change the id/year/dates, and point urls at the new speaker page.
+# The check reports broken or empty URLs in the weekly pull request.
+
+conferences:
+
+  # ---- Upcoming, speaker lists already published (as of Nov 2026) ----
+  - id: keystone-genome-eng-2027
+    conference: "Keystone Symposia: Precision Genome Engineering, From Laboratory to Clinic"
+    start: 2027-01-01
+    end: 2027-01-04
+    city: ""
+    country: "Location TBD"
+    urls:
+      - https://www.keystonesymposia.org/conferences/conference-listing/meeting/onpage-program/X22027
+
+  - id: pegs-ai-2027
+    conference: "PEGS AI 2027 (co-located with PepTalk)"
+    start: 2027-01-19
+    end: 2027-01-21
+    city: Carlsbad
+    country: USA
+    urls:
+      - https://www.pegsummit.com/pegs-ai/keynotes
+
+  - id: bps-2027
+    conference: "Biophysical Society 71st Annual Meeting"
+    start: 2027-02-20
+    end: 2027-02-24
+    city: Philadelphia
+    country: USA
+    urls:
+      - https://www.biophysics.org/2027meeting/program/scientific-sessions/symposia
+
+  - id: tides-usa-2027
+    conference: "TIDES USA: Oligonucleotide and Peptide Therapeutics 2027"
+    start: 2027-04-26
+    end: 2027-04-29
+    city: Boston
+    country: USA
+    urls:
+      - https://informaconnect.com/TIDES/speakers/
+
+  # ---- Upcoming, waiting for the program (check the URL when it is posted) ----
+  - id: aps-2027
+    conference: "30th American Peptide Symposium"
+    start: 2027-06-20
+    end: 2027-06-24
+    city: Boston
+    country: USA
+    urls:
+      - https://www.americanpeptidesociety.org/   # replace with the program/speakers page when posted
+
+  - id: protein-society-2027
+    conference: "Protein Society 41st Annual Symposium"
+    start: ""       # not announced yet
+    end: ""
+    city: ""
+    country: ""
+    urls:
+      - https://ps.memberclicks.net/program   # the society's current-program page; confirm it shows the 2027 meeting
+
+  - id: australian-peptide-2027
+    conference: "17th Australian Peptide Conference"
+    start: 2027-10-17
+    end: 2027-10-22
+    city: Port Douglas
+    country: Australia
+    urls:
+      - https://ozpeptide.org/
+
+  - id: lorne-proteins-2027
+    conference: "52nd Lorne Proteins Conference 2027"
+    start: ""
+    end: ""
+    city: Lorne
+    country: Australia
+    enabled: false   # URL guessed from the 2026 pattern; open it, then set enabled: true
+    urls:
+      - https://proteins-2027.p.asnevents.com.au/
+
+  - id: jps-2026
+    conference: "63rd Japanese Peptide Symposium"
+    start: ""
+    end: ""
+    city: ""
+    country: Japan
+    enabled: false   # URL guessed from the 62jps pattern; check before enabling
+    urls:
+      - https://www.peptide-soc.jp/63jps/en/special-program.html
+
+  # ---- Past editions, kept as examples and for re-checks (already logged) ----
+  - id: ps40-2026
+    conference: "Protein Society 40th Anniversary Symposium (PS40)"
+    start: 2026-07-19
+    end: 2026-07-22
+    city: Boston
+    country: USA
+    enabled: false
+    urls:
+      - https://ps.memberclicks.net/daily-program-ps40
+
+  - id: eps-2026
+    conference: "38th European Peptide Symposium (EPS 2026)"
+    start: 2026-09-06
+    end: 2026-09-11
+    city: Vienna
+    country: Austria
+    enabled: false
+    urls:
+      - https://airdrive.eventsair.com/eventsairwesteuprod/production-univie-public/a712793485d2416d95770e9aee840985
+
+  - id: jps-2025
+    conference: "62nd Japanese Peptide Symposium"
+    start: 2025-10-21
+    end: 2025-10-23
+    city: Fukuoka
+    country: Japan
+    enabled: false
+    urls:
+      - https://www.peptide-soc.jp/62jps/en/special-program.html
+
+
+# Professor pages to watch for changes (lab news, CV, "presentations" lists).
+# Nothing is added automatically: new lines that mention an event are listed in the
+# pull request for someone to look at. Add one entry per page.
+prof_pages:
+  - prof: hiroshi-murakami
+    url: https://www.chembio.nagoya-u.ac.jp/labhp/bioanal2/en/presentations.html
+  - prof: luke-lavis
+    url: https://www.janelia.org/lab/lavis-lab/publications
+  - prof: colin-jackson
+    url: https://biology.anu.edu.au/people/academics/colin-jackson
+    enabled: false   # check the page exists, then enable
+  # - prof: jeffrey-gray
+  #   url: https://graylab.jhu.edu/          # find the lab's news page

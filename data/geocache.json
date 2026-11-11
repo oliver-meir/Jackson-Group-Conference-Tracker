@@ -1,0 +1,86 @@
+{
+  "Bordeaux|France": [
+    44.8378,
+    -0.5792
+  ],
+  "Boston|USA": [
+    42.3601,
+    -71.0589
+  ],
+  "Brisbane|Australia": [
+    -27.4698,
+    153.0251
+  ],
+  "Brussels|Belgium": [
+    50.8503,
+    4.3517
+  ],
+  "Carlsbad|USA": [
+    33.1581,
+    -117.3506
+  ],
+  "Chicago|USA": [
+    41.8781,
+    -87.6298
+  ],
+  "Kyoto|Japan": [
+    35.0116,
+    135.7681
+  ],
+  "Leuven|Belgium": [
+    50.8798,
+    4.7005
+  ],
+  "London|UK": [
+    51.5074,
+    -0.1278
+  ],
+  "Lorne|Australia": [
+    -38.5418,
+    143.9757
+  ],
+  "Nagoya|Japan": [
+    35.1815,
+    136.9066
+  ],
+  "Philadelphia|USA": [
+    39.9526,
+    -75.1652
+  ],
+  "San Francisco|USA": [
+    37.7749,
+    -122.4194
+  ],
+  "Santa Clara|USA": [
+    37.3541,
+    -121.9552
+  ],
+  "Seoul|South Korea": [
+    37.5665,
+    126.978
+  ],
+  "St. Peter, Minnesota|USA": [
+    44.3236,
+    -93.958
+  ],
+  "Stanford|USA": [
+    37.4275,
+    -122.1697
+  ],
+  "Sydney|Australia": [
+    -33.8688,
+    151.2093
+  ],
+  "Tokyo|Japan": [
+    35.6762,
+    139.6503
+  ],
+  "Vancouver|Canada": [
+    49.2827,
+    -123.1207
+  ],
+  "Vienna|Austria": [
+    48.2082,
+    16.3738
+  ]
+}

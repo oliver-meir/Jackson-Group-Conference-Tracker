@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Professor Conference Tracker</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Plan: plain black and white working tool. Sidebar of professors, main pane switches between overview, per-person timeline, by-conference and table views. */
+:root{
+  --bg:#ffffff; --panel:#f6f6f5; --ink:#111111; --muted:#5f5f5c; --line:#d9d9d6; --accent:#1d3a6e;
+  --up:#1d3a6e; --up-bg:#e7ecf5; --past:#444442; --past-bg:#ececea; --warn:#8a5a00; --warn-bg:#f6ecd8;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121212; --panel:#1b1b1b; --ink:#ececea; --muted:#a3a39f; --line:#333331; --accent:#9db6e3;
+    --up:#b9cdf0; --up-bg:#1d2a40; --past:#cfcfcb; --past-bg:#2a2a28; --warn:#e9c27a; --warn-bg:#3a2f18;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121212; --panel:#1b1b1b; --ink:#ececea; --muted:#a3a39f; --line:#333331; --accent:#9db6e3;
+  --up:#b9cdf0; --up-bg:#1d2a40; --past:#cfcfcb; --past-bg:#2a2a28; --warn:#e9c27a; --warn-bg:#3a2f18;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:14px;line-height:1.45}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--line)}
+header h1{font-size:18px;font-weight:600;margin:0;text-wrap:balance}
+header .sub{color:var(--muted);font-size:12.5px}
+.actions{display:flex;flex-wrap:wrap;gap:6px}
+.btn{border:1px solid var(--line);background:var(--bg);padding:6px 11px;border-radius:4px;cursor:pointer}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn.small{padding:3px 8px;font-size:12.5px}
+.btn.link{border:none;background:none;padding:0;color:var(--accent);text-decoration:underline;cursor:pointer}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.layout{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 62px)}
+aside{border-right:1px solid var(--line);background:var(--panel);padding:14px;display:flex;flex-direction:column;gap:10px}
+aside input{width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:4px;background:var(--bg)}
+.plist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.plist button{width:100%;text-align:left;border:none;background:none;padding:7px 8px;border-radius:4px;cursor:pointer;display:grid;grid-template-columns:1fr auto;gap:2px 8px}
+.plist button:hover{background:var(--bg)}
+.plist button[aria-current="true"]{background:var(--bg);box-shadow:inset 3px 0 0 var(--ink)}
+.plist .nm{font-weight:500}
+.plist .af{grid-column:1/2;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.plist .ct{grid-row:1/3;grid-column:2;align-self:center;font-family:var(--font-mono);font-size:11.5px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+main{padding:16px 20px;min-width:0;display:flex;flex-direction:column;gap:14px}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tabs a{padding:7px 12px;text-decoration:none;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--ink);font-weight:500}
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.filters select,.filters input{padding:5px 8px;border:1px solid var(--line);border-radius:4px;background:var(--bg)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.seg button{border:none;background:var(--bg);padding:5px 10px;cursor:pointer;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:none}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.note{color:var(--muted);font-size:12.5px}
+.banner{border:1px solid var(--line);background:var(--panel);padding:10px 12px;border-radius:4px;font-size:13px}
+.banner.warn{background:var(--warn-bg);border-color:transparent;color:var(--warn)}
+.pill{display:inline-block;font-size:11.5px;padding:1px 7px;border-radius:999px;white-space:nowrap;font-weight:500}
+.pill.up{background:var(--up-bg);color:var(--up)}
+.pill.past{background:var(--past-bg);color:var(--past)}
+.pill.tbc{border:1px dashed var(--line);color:var(--muted)}
+.av{position:relative;display:inline-flex;align-items:center;justify-content:center;flex:none;border-radius:50%;overflow:hidden;background:var(--past-bg);color:var(--ink);font-weight:600;letter-spacing:.02em;border:1px solid var(--line)}
+.av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.who{display:flex;gap:12px;align-items:center}
+.plist button{grid-template-columns:auto 1fr auto}
+.plist .avc{grid-row:1/3;grid-column:1;align-self:center}
+.plist .nm,.plist .af{grid-column:2}
+.plist .ct{grid-column:3}
+#map{height:540px;border:1px solid var(--line);border-radius:6px}
+.nomap{font-size:12.5px;color:var(--muted)}
+.pill.role{border:1px solid var(--line);color:var(--ink);font-weight:400}
+.pill.conf-Confirmed{background:var(--past-bg);color:var(--ink)}
+.pill.conf-Reported{background:var(--past-bg);color:var(--muted)}
+.pill.conf-Unverified{background:var(--warn-bg);color:var(--warn)}
+.overview{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.card{border:1px solid var(--line);border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--bg)}
+.card h3{margin:0;font-size:15px;font-weight:600}
+.card .af{color:var(--muted);font-size:12.5px;margin-top:-6px}
+.kv{display:grid;grid-template-columns:72px 1fr;gap:4px 10px;font-size:13px}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{font-size:12px;border:1px solid var(--line);border-radius:3px;padding:0 6px}
+.tl{display:flex;flex-direction:column;gap:18px}
+.tl h2{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 6px;font-weight:500}
+.tl .yr{font-family:var(--font-mono);font-size:12.5px;color:var(--muted);margin:10px 0 4px}
+.ev{display:grid;grid-template-columns:150px 1fr auto;gap:4px 14px;padding:9px 0;border-top:1px solid var(--line);align-items:start}
+.ev .dt{font-family:var(--font-mono);font-size:12.5px;font-variant-numeric:tabular-nums;color:var(--muted)}
+.ev .cn{font-weight:500}
+.ev .loc{color:var(--muted);font-size:13px}
+.ev .meta{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;align-items:center;font-size:12.5px}
+.ev .ops{display:flex;gap:4px}
+.confs{display:flex;flex-direction:column;gap:10px}
+.conf{border:1px solid var(--line);border-radius:6px;padding:10px 12px;display:grid;grid-template-columns:1fr auto;gap:6px 12px}
+.conf .cn{font-weight:600}
+.conf .loc{color:var(--muted);font-size:13px}
+.conf ul{grid-column:1/-1;margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:6px}
+.conf li{border:1px solid var(--line);border-radius:4px;padding:2px 8px;font-size:13px}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:6px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:500;color:var(--muted);background:var(--panel);cursor:pointer;white-space:nowrap;user-select:none}
+td.mono{font-family:var(--font-mono);font-size:12.5px;white-space:nowrap;font-variant-numeric:tabular-nums}
+tr:last-child td{border-bottom:none}
+.empty{border:1px dashed var(--line);border-radius:6px;padding:20px;color:var(--muted);display:flex;flex-direction:column;gap:8px;max-width:640px}
+.empty strong{color:var(--ink)}
+.empty ol{margin:0;padding-left:20px}
+/* dialog */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto;z-index:10}
+.scrim.open{display:flex}
+.dlg{background:var(--bg);border:1px solid var(--line);border-radius:8px;width:100%;max-width:620px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.dlg h2{margin:0;font-size:16px}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form label{display:flex;flex-direction:column;gap:3px;font-size:12.5px;color:var(--muted)}
+.form label.full{grid-column:1/-1}
+.form input,.form select,.form textarea{padding:6px 8px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--ink);font-size:14px}
+.form textarea{min-height:90px;resize:vertical}
+.dlg .row{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.err{color:#b00020;font-size:12.5px}
+.matches{display:flex;flex-direction:column;gap:4px;max-height:240px;overflow:auto;border:1px solid var(--line);border-radius:4px;padding:8px}
+.matches label{display:flex;gap:8px;align-items:flex-start;color:var(--ink);font-size:13px}
+.matches .ctx{color:var(--muted);font-size:12px}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:4px;font-size:13px;display:none;z-index:20}
+@media (max-width:760px){
+  .layout{grid-template-columns:1fr}
+  aside{border-right:none;border-bottom:1px solid var(--line)}
+  .plist{max-height:220px;overflow:auto}
+  .ev{grid-template-columns:1fr}
+  .form{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+.guide{max-width:780px;display:flex;flex-direction:column;gap:6px}
+.guide h2{font-size:15px;margin:14px 0 2px}
+.guide p,.guide li{line-height:1.55}
+.guide ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:5px}
+.guide code{font-family:var(--font-mono);font-size:12.5px}
+.leaflet-popup-content{font-family:var(--font-body);font-size:12.5px;line-height:1.5}
+@media (max-width:760px){#map{height:380px}}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Professor Conference Tracker</h1>
+    <div class="sub"><span id="summary">Loading data...</span> <span id="dataDate"></span></div>
+  </div>
+  <div class="actions">
+    <button class="btn" id="btnAddProf" type="button">Add professor</button>
+    <button class="btn" id="btnAddApp" type="button">Add appearance</button>
+    <button class="btn" id="btnImport" type="button">Check a speaker list</button>
+    <a class="btn" href="data/talks.ics" download style="text-decoration:none;color:inherit">Calendar (.ics)</a>
+    <button class="btn" id="btnCsv" type="button">Download CSV</button>
+    <button class="btn" id="btnExport" type="button">Export data</button>
+    <button class="btn" id="btnImportData" type="button">Import data</button>
+    <input type="file" id="fileIn" accept=".json,application/json" hidden>
+  </div>
+</header>
+<div class="layout">
+  <aside>
+    <input id="pSearch" type="search" placeholder="Filter professors" aria-label="Filter professors">
+    <ul class="plist" id="plist"></ul>
+  </aside>
+  <main>
+    <nav class="tabs" aria-label="Views">
+      <a href="#overview" data-view="overview">Overview</a>
+      <a href="#timeline" data-view="timeline">Timeline</a>
+      <a href="#conferences" data-view="conferences">By conference</a>
+      <a href="#table" data-view="table">Table</a>
+      <a href="#map" data-view="map">Map</a>
+      <a href="#about" data-view="about">About</a>
+    </nav>
+    <div class="filters">
+      <div class="seg" role="group" aria-label="When">
+        <button type="button" data-when="all" aria-pressed="true">All</button>
+        <button type="button" data-when="up" aria-pressed="false">Upcoming</button>
+        <button type="button" data-when="past" aria-pressed="false">Past</button>
+      </div>
+      <select id="fCountry" aria-label="Country"><option value="">All countries</option></select>
+      <input id="fText" type="search" placeholder="Search conference or city" aria-label="Search conference or city">
+      <span class="note" id="fCount"></span>
+    </div>
+    <div id="status"></div>
+    <div id="view"></div>
+  </main>
+</div>
+
+<div class="scrim" id="scrim" role="dialog" aria-modal="true"><div class="dlg" id="dlg"></div></div>
+<div class="toast" id="toast" role="status"></div>
+
+<template id="aboutTpl"><div class="guide">
+<h2>What this is</h2>
+<p>A tracker of where our professors of interest have spoken or chaired at conferences, and where they are scheduled to appear. Every entry links to its source. Evidence levels: <strong>Confirmed</strong> (named in the official program), <strong>Reported</strong> (CV, lab site, news) or <strong>Unverified</strong> (found automatically, not yet checked). Plain attendance is rarely published, so the tracker covers speaking roles. Upcoming events show once a conference publishes its speakers, usually 3 to 9 months ahead.</p>
+
+<h2>How it stays up to date</h2>
+<p>Every Monday morning a GitHub Action reads the conference pages listed in <code>watchlist.yaml</code>, looks for each professor's name, and opens a pull request with anything new. No AI is involved, just name matching. The pull request lists each match with a text snippet and a "looks right" or "check carefully" flag. A lab member checks the links, fixes roles or dates, and merges. The website updates a minute later.</p>
+
+<h2>Common jobs</h2>
+<ul>
+<li><strong>Review the weekly pull request:</strong> GitHub, Pull requests tab, open "Weekly check". Click each source link. To fix a row, use the pencil icon on <code>data/tracker.json</code> in the pull request. Merge when happy, or close it if every match is wrong.</li>
+<li><strong>Add a conference:</strong> edit <code>watchlist.yaml</code> on GitHub and copy an existing block. Point <code>urls</code> at the program or invited-speakers page.</li>
+<li><strong>Add or edit entries without code:</strong> make the change on this website, click <strong>Export data</strong>, then on GitHub open the <code>data</code> folder, Add file, Upload files, and upload <code>tracker.json</code>. The site rebuilds itself.</li>
+<li><strong>Check a speaker list by hand:</strong> paste a program into <strong>Check a speaker list</strong>. Matching runs in your browser.</li>
+<li><strong>Add a professor:</strong> use Add professor, fill in "other name forms" (initials, spelling variants), then Export and upload as above. To cut false matches for common names, add affiliation words as <code>context</code> in tracker.json.</li>
+<li><strong>Add a photo:</strong> upload a square image to the <code>photos</code> folder named after the professor's id, for example <code>photos/colin-jackson.jpg</code>. Without one, initials are shown. Use photos you have permission to use, such as ones the professor or their institution provides for this purpose.</li>
+<li><strong>Calendar:</strong> the Calendar button downloads all dated talks as an .ics file. On the hosted site you can subscribe to <code>data/talks.ics</code> in Outlook or Google Calendar so it stays current.</li>
+</ul>
+
+<h2>Built with</h2>
+<p>Python (requests, BeautifulSoup, pdfplumber, RapidFuzz, PyYAML), GitHub Actions with peter-evans/create-pull-request, Leaflet with OpenStreetMap tiles, and OpenStreetMap Nominatim for city coordinates. See README.md in the repository for setup and details.</p>
+</div>
+</template>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="data/tracker.js"></script>
+<script>
+(function(){
+  "use strict";
+  var ROLES=["Keynote","Plenary","Invited talk","Contributed talk","Poster","Session chair","Organiser","Panel","Attendee","Unknown"];
+  var CONF=["Confirmed","Reported","Unverified"];
+  var CONF_HELP={Confirmed:"Named in the official program or speaker list",Reported:"From a CV, lab site, news item or social post",Unverified:"Likely but not yet sourced"};
+  var state={profs:[],apps:[],sel:"",view:"overview",when:"all",country:"",text:"",sortKey:"start",sortDir:"desc",db:null,canWrite:true,loaded:false,sample:null};
+  var TODAY=new Date().toISOString().slice(0,10);
+  var $=function(id){return document.getElementById(id)};
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+  function slug(s){return String(s).toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,60)||("p"+Date.now())}
+  function toast(m){var t=$("toast");t.textContent=m;t.style.display="block";clearTimeout(toast._t);toast._t=setTimeout(function(){t.style.display="none"},2600)}
+  function validDate(s){return !s||/^\d{4}(-\d{2}(-\d{2})?)?$/.test(s)}
+  function padEnd(s){if(!s)return "";if(s.length===4)return s+"-12-31";if(s.length===7)return s+"-31";return s}
+  function padStart(s){if(!s)return "";if(s.length===4)return s+"-01-01";if(s.length===7)return s+"-01";return s}
+  function status(a){var e=padEnd(a.endDate||a.startDate);return !e?"tbc":(e>=TODAY?"up":"past")}
+  function isUp(a){return status(a)==="up"}
+  var STAT={up:"Upcoming",past:"Past",tbc:"Date TBC"};
+  function initials(name){var t=String(name||"").replace(/[^A-Za-z\u00C0-\u024F .-]/g,"").split(/\s+/).filter(function(w){return w&&!/^(van|der|den|de|von|da|di|le)$/i.test(w)&&w.length>1});return ((t[0]||"?")[0]+(t.length>1?t[t.length-1][0]:"")).toUpperCase()}
+  // Photos: put photos/<professor id>.jpg (or .png) in the repo. Falls back to initials.
+  window.avErr=function(img){if(/\.jpg$/.test(img.getAttribute("src"))){img.setAttribute("src",img.getAttribute("src").replace(/\.jpg$/,".png"))}else{img.remove()}};
+  function avatar(p,size){var fs=Math.round(size*0.38);return '<span class="av" style="width:'+size+'px;height:'+size+'px;font-size:'+fs+'px" aria-hidden="true">'+initials(p.name)+'<img src="photos/'+esc(p.photo||p.id)+(p.photo?"":".jpg")+'" alt="" loading="lazy" onerror="avErr(this)"></span>'}
+  function statPill(a){var st=status(a);return '<span class="pill '+st+'">'+STAT[st]+'</span>'}
+  function sortKey(a){return padStart(a.startDate)||"0000"}
+  var MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  function fmt1(s){if(!s)return "";var p=s.split("-");if(p.length===1)return p[0];if(p.length===2)return MON[+p[1]-1]+" "+p[0];return (+p[2])+" "+MON[+p[1]-1]+" "+p[0]}
+  function fmtRange(a){
+    var s=a.startDate,e=a.endDate;if(!s)return "Date unknown";if(!e||e===s)return fmt1(s);
+    var ps=s.split("-"),pe=e.split("-");
+    if(ps.length===3&&pe.length===3&&ps[0]===pe[0]&&ps[1]===pe[1])return (+ps[2])+" to "+(+pe[2])+" "+MON[+ps[1]-1]+" "+ps[0];
+    return fmt1(s)+" to "+fmt1(e);
+  }
+  function loc(a){return [a.city,a.country].filter(Boolean).join(", ")||"Location unknown"}
+  function prof(id){for(var i=0;i<state.profs.length;i++)if(state.profs[i].id===id)return state.profs[i];return null}
+  function profName(id){var p=prof(id);return p?p.name:"(removed professor)"}
+
+  function filtered(){
+    var t=state.text.toLowerCase();
+    return state.apps.filter(function(a){
+      if(state.sel&&a.profId!==state.sel)return false;
+      if(state.when==="up"&&!isUp(a))return false;
+      if(state.when==="past"&&status(a)!=="past")return false;
+      if(state.country&&a.country!==state.country)return false;
+      if(t&&((a.conference||"")+" "+(a.city||"")+" "+(a.country||"")+" "+profName(a.profId)).toLowerCase().indexOf(t)<0)return false;
+      return true;
+    });
+  }
+
+  function renderSummary(){
+    var up=state.apps.filter(isUp).length;
+    var countries={};state.apps.forEach(function(a){if(a.country)countries[a.country]=1});
+    $("summary").textContent=state.loaded?(state.profs.length+" professors · "+state.apps.length+" appearances ("+up+" upcoming) · "+Object.keys(countries).length+" countries"):"Loading data...";
+    var sel=$("fCountry"),cur=state.country,keys=Object.keys(countries).sort();
+    sel.innerHTML='<option value="">All countries</option>'+keys.map(function(k){return '<option'+(k===cur?" selected":"")+'>'+esc(k)+'</option>'}).join("");
+  }
+
+  function renderList(){
+    var q=$("pSearch").value.toLowerCase();
+    var html='<li><button type="button" data-p="" aria-current="'+(!state.sel)+'"><span class="avc"><span class="av" style="width:28px;height:28px;font-size:11px">All</span></span><span class="nm">All professors</span><span class="af">'+state.profs.length+' tracked</span><span class="ct">'+state.apps.length+'</span></button></li>';
+    state.profs.slice().sort(function(a,b){return a.name.localeCompare(b.name)}).forEach(function(p){
+      if(q&&(p.name+" "+(p.affiliation||"")).toLowerCase().indexOf(q)<0)return;
+      var mine=state.apps.filter(function(a){return a.profId===p.id});
+      var up=mine.filter(isUp).length;
+      html+='<li><button type="button" data-p="'+esc(p.id)+'" aria-current="'+(state.sel===p.id)+'"><span class="avc">'+avatar(p,28)+'</span><span class="nm">'+esc(p.name)+'</span><span class="af">'+esc(p.affiliation||"")+'</span><span class="ct" title="past / upcoming">'+(mine.length-up)+' / '+up+'</span></button></li>';
+    });
+    $("plist").innerHTML=html;
+  }
+
+  function emptyState(){
+    return '<div class="empty"><strong>No professors tracked yet.</strong>'+
+      '<ol><li>Add each professor of interest with <em>Add professor</em>.</li>'+
+      '<li>Log where they have spoken or attended with <em>Add appearance</em>, with a source link for each one.</li>'+
+      '<li>When a conference publishes its speaker list or program, paste it into <em>Check a speaker list</em> to flag every tracked professor on it in one go.</li></ol>'+
+      '</div>';
+  }
+
+  function evRow(a,showName){
+    return '<div class="ev"><div class="dt">'+esc(fmtRange(a))+'</div><div>'+
+      (showName?'<div class="note">'+esc(profName(a.profId))+'</div>':'')+
+      '<div class="cn">'+esc(a.conference||"Untitled")+'</div><div class="loc">'+esc(loc(a))+'</div>'+
+      '<div class="meta">'+statPill(a)+
+      '<span class="pill role">'+esc(a.role||"Unknown")+'</span>'+
+      '<span class="pill conf-'+esc(a.confidence||"Unverified")+'" title="'+esc(CONF_HELP[a.confidence||"Unverified"]||"")+'">'+esc(a.confidence||"Unverified")+'</span>'+
+      (a.sourceUrl?'<a href="'+esc(a.sourceUrl)+'" target="_blank" rel="noopener">Source</a>':'<span class="note">No source</span>')+
+      (a.notes?'<span class="note">'+esc(a.notes)+'</span>':'')+
+      '</div></div><div class="ops">'+(state.canWrite?'<button class="btn small" type="button" data-edit="'+esc(a.id)+'">Edit</button>':'')+'</div></div>';
+  }
+
+  function renderOverview(list){
+    var profs=state.sel?[prof(state.sel)].filter(Boolean):state.profs.slice().sort(function(a,b){return a.name.localeCompare(b.name)});
+    if(!profs.length)return emptyState();
+    return '<div class="overview">'+profs.map(function(p){
+      var mine=list.filter(function(a){return a.profId===p.id});
+      var ups=mine.filter(isUp).sort(function(a,b){return sortKey(a)<sortKey(b)?-1:1});
+      var past=mine.filter(function(a){return status(a)==="past"}).sort(function(a,b){return sortKey(a)>sortKey(b)?-1:1});
+      var places={};mine.forEach(function(a){var k=a.country||"Unknown";places[k]=(places[k]||0)+1});
+      var next=ups[0],last=past[0];
+      return '<div class="card"><div class="who">'+avatar(p,52)+'<div><h3>'+esc(p.name)+'</h3><div class="af" style="margin-top:2px">'+esc(p.affiliation||"")+(p.field?" · "+esc(p.field):"")+'</div></div></div>'+
+        '<dl class="kv"><dt>Next</dt><dd>'+(next?'<strong>'+esc(next.conference)+'</strong><br><span class="note">'+esc(fmtRange(next))+' · '+esc(loc(next))+'</span>':'<span class="note">Nothing announced yet</span>')+'</dd>'+
+        '<dt>Last</dt><dd>'+(last?esc(last.conference)+'<br><span class="note">'+esc(fmtRange(last))+' · '+esc(loc(last))+'</span>':'<span class="note">None logged</span>')+'</dd>'+
+        '<dt>Logged</dt><dd>'+past.length+' past, '+ups.length+' upcoming</dd></dl>'+
+        (Object.keys(places).length?'<div class="chips">'+Object.keys(places).sort().map(function(k){return '<span class="chip">'+esc(k)+' '+places[k]+'</span>'}).join("")+'</div>':'')+
+        '<div><button class="btn small" type="button" data-open="'+esc(p.id)+'">Open timeline</button></div></div>';
+    }).join("")+'</div>';
+  }
+
+  function renderTimeline(list){
+    if(!state.profs.length)return emptyState();
+    var show=!state.sel;
+    var ups=list.filter(isUp).sort(function(a,b){return sortKey(a)<sortKey(b)?-1:1});
+    var past=list.filter(function(a){return status(a)==="past"}).sort(function(a,b){return sortKey(a)>sortKey(b)?-1:1});
+    var tbc=list.filter(function(a){return status(a)==="tbc"});
+    var h='<div class="tl">';
+    if(state.sel){var p=prof(state.sel);if(p)h+='<div class="who">'+avatar(p,72)+'<div><strong style="font-size:17px">'+esc(p.name)+'</strong><div class="note">'+esc(p.affiliation||"")+(p.field?" · "+esc(p.field):"")+'</div>'+(p.notes?'<div class="note">'+esc(p.notes)+'</div>':'')+(state.canWrite?' <button class="btn link" type="button" data-editp="'+esc(p.id)+'">Edit professor</button>':'')+'</div></div>'}
+    if(state.when!=="past"){h+='<section><h2>Upcoming ('+ups.length+')</h2>'+(ups.length?ups.map(function(a){return evRow(a,show)}).join(""):'<div class="note">No upcoming appearances logged.</div>')+'</section>'}
+    if(state.when==="all"&&tbc.length){h+='<section><h2>Date not confirmed ('+tbc.length+')</h2>'+tbc.map(function(a){return evRow(a,show)}).join("")+'</section>'}
+    if(state.when!=="up"){
+      h+='<section><h2>Past ('+past.length+')</h2>';
+      if(!past.length)h+='<div class="note">No past appearances logged.</div>';
+      var yr=null;past.forEach(function(a){var y=(a.startDate||"????").slice(0,4);if(y!==yr){yr=y;h+='<div class="yr">'+esc(y==="????"?"Year unknown":y)+'</div>'}h+=evRow(a,show)});
+      h+='</section>';
+    }
+    return h+'</div>';
+  }
+
+  function renderConfs(list){
+    if(!state.profs.length)return emptyState();
+    var g={};
+    list.forEach(function(a){var k=(a.conference||"Untitled")+"|"+(a.startDate||"").slice(0,4);(g[k]=g[k]||[]).push(a)});
+    var keys=Object.keys(g).sort(function(x,y){var a=sortKey(g[x][0]),b=sortKey(g[y][0]);return a>b?-1:a<b?1:0});
+    if(!keys.length)return '<div class="note">No appearances match these filters.</div>';
+    return '<div class="confs">'+keys.map(function(k){
+      var items=g[k],a=items[0];
+      return '<div class="conf"><div><div class="cn">'+esc(a.conference||"Untitled")+'</div><div class="loc">'+esc(fmtRange(a))+' · '+esc(loc(a))+'</div></div>'+
+        '<div>'+statPill(a)+'</div>'+
+        '<ul>'+items.map(function(x){return '<li>'+esc(profName(x.profId))+' <span class="note">'+esc(x.role||"")+'</span>'+(x.sourceUrl?' <a href="'+esc(x.sourceUrl)+'" target="_blank" rel="noopener">src</a>':'')+'</li>'}).join("")+'</ul></div>';
+    }).join("")+'</div>';
+  }
+
+  var COLS=[["prof","Professor"],["conference","Conference"],["start","Dates"],["city","City"],["country","Country"],["role","Role"],["confidence","Evidence"],["status","Status"]];
+  function cell(a,k){if(k==="prof")return profName(a.profId);if(k==="start")return sortKey(a);if(k==="status")return STAT[status(a)];return a[k]||""}
+  function renderTable(list){
+    if(!state.profs.length)return emptyState();
+    var k=state.sortKey,d=state.sortDir==="asc"?1:-1;
+    var rows=list.slice().sort(function(a,b){var x=String(cell(a,k)).toLowerCase(),y=String(cell(b,k)).toLowerCase();return x<y?-d:x>y?d:0});
+    return '<div class="tablewrap"><table><thead><tr>'+COLS.map(function(c){return '<th data-sort="'+c[0]+'" scope="col">'+c[1]+(k===c[0]?(state.sortDir==="asc"?" ▲":" ▼"):"")+'</th>'}).join("")+'<th>Source</th><th></th></tr></thead><tbody>'+
+      rows.map(function(a){return '<tr><td>'+esc(profName(a.profId))+'</td><td>'+esc(a.conference)+'</td><td class="mono">'+esc(fmtRange(a))+'</td><td>'+esc(a.city)+'</td><td>'+esc(a.country)+'</td><td>'+esc(a.role)+'</td><td>'+esc(a.confidence)+'</td><td>'+statPill(a)+'</td><td>'+(a.sourceUrl?'<a href="'+esc(a.sourceUrl)+'" target="_blank" rel="noopener">Link</a>':'')+'</td><td>'+(state.canWrite?'<button class="btn small" type="button" data-edit="'+esc(a.id)+'">Edit</button>':'')+'</td></tr>'}).join("")+
+      '</tbody></table></div>';
+  }
+
+  function render(){
+    renderSummary();renderList();
+    document.querySelectorAll(".tabs a").forEach(function(a){a.setAttribute("aria-current",a.dataset.view===state.view?"page":"false")});
+    document.querySelectorAll("[data-when]").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.when===state.when))});
+    var list=filtered();
+    $("fCount").textContent=state.loaded?list.length+" shown":"";
+    var v=state.view,h;
+    document.querySelector(".filters").style.display=v==="about"?"none":"";
+    if(!state.loaded){h='<div class="note">Loading data...</div>'}
+    else if(v==="timeline")h=renderTimeline(list);
+    else if(v==="conferences")h=renderConfs(list);
+    else if(v==="table")h=renderTable(list);
+    else if(v==="map")h='<div id="map"></div><div class="nomap" id="nomap"></div>';
+    else if(v==="about")h=document.getElementById("aboutTpl").innerHTML;
+    else h=renderOverview(list);
+    if(state.map){state.map.remove();state.map=null}
+    $("view").innerHTML=h;
+    if(v==="map")drawMap(list);
+    ["btnAddProf","btnAddApp","btnImport"].forEach(function(id){$(id).disabled=!state.canWrite});
+    $("btnAddApp").disabled=$("btnAddApp").disabled||!state.profs.length;
+    $("btnImport").disabled=$("btnImport").disabled||!state.profs.length;
+  }
+
+  // map (Leaflet + OpenStreetMap tiles; needs internet)
+  function drawMap(list){
+    var el=$("map");if(!el)return;
+    if(!window.L){el.outerHTML='<div class="banner warn">The map needs an internet connection to load. Everything else works offline.</div>';return}
+    var groups={},off=[];
+    list.forEach(function(a){var g=GEO[(a.city||"")+"|"+(a.country||"")];if(!g){off.push(a);return}var k=g.join(",");(groups[k]=groups[k]||{ll:g,items:[]}).items.push(a)});
+    var m=L.map(el,{scrollWheelZoom:false,worldCopyJump:true});state.map=m;
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(m);
+    var css=getComputedStyle(document.documentElement),cUp=css.getPropertyValue("--up").trim()||"#1d3a6e",cPast=css.getPropertyValue("--muted").trim()||"#666";
+    var pts=[];
+    Object.keys(groups).forEach(function(k){var g=groups[k],up=g.items.some(isUp);
+      var html='<strong>'+esc(loc(g.items[0]))+'</strong><br>'+g.items.sort(function(a,b){return sortKey(a)<sortKey(b)?1:-1}).map(function(a){return esc(profName(a.profId))+': '+esc(a.conference)+' <span style="color:#666">('+esc(fmtRange(a))+')</span>'}).join("<br>");
+      L.circleMarker(g.ll,{radius:6+Math.min(10,g.items.length*2),color:up?cUp:cPast,weight:2,fillColor:up?cUp:cPast,fillOpacity:up?0.55:0.25}).bindPopup(html,{maxWidth:340}).addTo(m);pts.push(g.ll)});
+    if(pts.length)m.fitBounds(pts,{padding:[30,30],maxZoom:5});else m.setView([20,0],2);
+    $("nomap").textContent=off.length?("Not on the map ("+off.length+"): "+off.map(function(a){return profName(a.profId)+", "+a.conference+" ("+(a.country||"no location")+")"}).join("; ")):"";
+    $("nomap").insertAdjacentHTML("afterbegin",'<div style="margin:6px 0">Filled circles: upcoming. Faint circles: past. Bigger circle: more appearances there. Click a circle for details.</div>');
+  }
+
+  // routing
+  function route(){var h=(location.hash||"").slice(1);state.view=["overview","timeline","conferences","table","map","about"].indexOf(h)>=0?h:"overview";render()}
+  window.addEventListener("hashchange",route);
+
+  // events
+  $("plist").addEventListener("click",function(e){var b=e.target.closest("[data-p]");if(!b)return;state.sel=b.dataset.p;if(state.sel&&state.view==="overview"){location.hash="timeline";return}render()});
+  $("pSearch").addEventListener("input",renderList);
+  document.querySelector(".filters").addEventListener("click",function(e){var b=e.target.closest("[data-when]");if(!b)return;state.when=b.dataset.when;render()});
+  $("fCountry").addEventListener("change",function(e){state.country=e.target.value;render()});
+  $("fText").addEventListener("input",function(e){state.text=e.target.value;render()});
+  $("view").addEventListener("click",function(e){
+    var t;
+    if((t=e.target.closest("[data-open]"))){state.sel=t.dataset.open;location.hash="timeline";return}
+    if((t=e.target.closest("[data-edit]"))){openApp(t.dataset.edit);return}
+    if((t=e.target.closest("[data-editp]"))){openProf(t.dataset.editp);return}
+    if((t=e.target.closest("[data-sort]"))){var k=t.dataset.sort;if(state.sortKey===k)state.sortDir=state.sortDir==="asc"?"desc":"asc";else{state.sortKey=k;state.sortDir="asc"}render()}
+  });
+
+  // dialog helpers
+  function openDlg(html){$("dlg").innerHTML=html;$("scrim").classList.add("open");var f=$("dlg").querySelector("input,select,textarea");if(f)f.focus()}
+  function closeDlg(){$("scrim").classList.remove("open");$("dlg").innerHTML=""}
+  $("scrim").addEventListener("click",function(e){if(e.target===$("scrim"))closeDlg()});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"&&$("scrim").classList.contains("open"))closeDlg()});
+  function val(id){var el=$(id);return el?el.value.trim():""}
+  function dbErr(e){var c=e&&e.code;if(c==="invalid_argument"){state.canWrite=false;render();return "You have view-only access to this tracker, so changes cannot be saved."}if(c==="quota_exceeded")return "The tracker is full. Delete some old entries and try again.";return "Could not save: "+((e&&e.message)||"unknown error")+". Try again in a moment."}
+
+  // professor form
+  function openProf(id){
+    var p=id?prof(id):{};
+    openDlg('<h2>'+(id?"Edit professor":"Add professor")+'</h2><form class="form" id="fp">'+
+      '<label class="full" for="pName">Full name<input id="pName" required value="'+esc(p.name||"")+'" placeholder="e.g. Jane A. Smith"></label>'+
+      '<label for="pAff">Affiliation<input id="pAff" value="'+esc(p.affiliation||"")+'" placeholder="University, department"></label>'+
+      '<label for="pField">Field<input id="pField" value="'+esc(p.field||"")+'" placeholder="e.g. protein engineering"></label>'+
+      '<label class="full" for="pAlias">Other name forms (comma separated, used by the speaker list check)<input id="pAlias" value="'+esc((p.aliases||[]).join(", "))+'" placeholder="e.g. J. Smith, Jane Smith-Lee"></label>'+
+      '<label class="full" for="pNotes">Notes<textarea id="pNotes" placeholder="Why this person matters, profile links">'+esc(p.notes||"")+'</textarea></label>'+
+      '</form><div class="err" id="pErr"></div><div class="row">'+(id?'<button class="btn" type="button" id="pDel">Delete professor</button>':'')+'<button class="btn" type="button" id="pCancel">Cancel</button><button class="btn primary" type="button" id="pSave">Save</button></div>');
+    $("pCancel").onclick=closeDlg;
+    $("fp").onsubmit=function(e){e.preventDefault();$("pSave").click()};
+    if(id)$("pDel").onclick=async function(){
+      var n=state.apps.filter(function(a){return a.profId===id}).length;
+      if($("pDel").dataset.armed!=="1"){$("pDel").dataset.armed="1";$("pDel").textContent=n?"Delete with "+n+" appearances?":"Confirm delete";return}
+      try{for(var i=0;i<state.apps.length;i++){if(state.apps[i].profId===id)await state.db.doc("appearances/"+state.apps[i].id).delete()}
+        await state.db.doc("profs/"+id).delete();if(state.sel===id)state.sel="";closeDlg();toast("Professor deleted")}catch(err){$("pErr").textContent=dbErr(err)}
+    };
+    $("pSave").onclick=async function(){
+      var name=val("pName");if(!name){$("pErr").textContent="Enter a name.";return}
+      var body={name:name,affiliation:val("pAff"),field:val("pField"),notes:val("pNotes"),aliases:val("pAlias").split(",").map(function(s){return s.trim()}).filter(Boolean),updatedAt:new Date().toISOString()};
+      var pid=id;if(!pid){pid=slug(name);if(prof(pid))pid=pid+"-"+Date.now().toString(36)}
+      $("pSave").disabled=true;
+      try{await state.db.doc("profs/"+pid).set(body);closeDlg();toast(id?"Saved":"Professor added")}catch(err){$("pSave").disabled=false;$("pErr").textContent=dbErr(err)}
+    };
+  }
+
+  // appearance form
+  function appForm(a){
+    var opts=state.profs.slice().sort(function(x,y){return x.name.localeCompare(y.name)}).map(function(p){return '<option value="'+esc(p.id)+'"'+(p.id===(a.profId||state.sel)?" selected":"")+'>'+esc(p.name)+'</option>'}).join("");
+    return '<form class="form" id="fa">'+
+      '<label class="full" for="aProf">Professor<select id="aProf">'+opts+'</select></label>'+
+      '<label class="full" for="aConf">Conference<input id="aConf" required value="'+esc(a.conference||"")+'" placeholder="e.g. SynBioBeta 2025"></label>'+
+      '<label for="aStart">Start date (YYYY, YYYY-MM or YYYY-MM-DD)<input id="aStart" value="'+esc(a.startDate||"")+'" placeholder="2025-07-14"></label>'+
+      '<label for="aEnd">End date<input id="aEnd" value="'+esc(a.endDate||"")+'" placeholder="2025-07-18"></label>'+
+      '<label for="aCity">City<input id="aCity" value="'+esc(a.city||"")+'"></label>'+
+      '<label for="aCountry">Country<input id="aCountry" value="'+esc(a.country||"")+'"></label>'+
+      '<label for="aRole">Role<select id="aRole">'+ROLES.map(function(r){return '<option'+(r===(a.role||"Unknown")?" selected":"")+'>'+r+'</option>'}).join("")+'</select></label>'+
+      '<label for="aConfd">Evidence<select id="aConfd">'+CONF.map(function(r){return '<option value="'+r+'"'+(r===(a.confidence||"Unverified")?" selected":"")+'>'+r+': '+CONF_HELP[r]+'</option>'}).join("")+'</select></label>'+
+      '<label class="full" for="aSrc">Source link<input id="aSrc" type="url" value="'+esc(a.sourceUrl||"")+'" placeholder="Program PDF, speaker page, CV, news item"></label>'+
+      '<label class="full" for="aNotes">Notes<input id="aNotes" value="'+esc(a.notes||"")+'" placeholder="Talk title, session, co-speakers"></label></form>';
+  }
+  function readApp(){
+    var b={profId:val("aProf"),conference:val("aConf"),startDate:val("aStart"),endDate:val("aEnd"),city:val("aCity"),country:val("aCountry"),role:val("aRole"),confidence:val("aConfd"),sourceUrl:val("aSrc"),notes:val("aNotes"),updatedAt:new Date().toISOString()};
+    if(!b.conference)return "Enter the conference name.";
+    if(!validDate(b.startDate)||!validDate(b.endDate))return "Dates must look like 2025, 2025-07 or 2025-07-14.";
+    if(b.sourceUrl&&!/^https?:\/\//i.test(b.sourceUrl))return "Source link must start with http:// or https://.";
+    return b;
+  }
+  function openApp(id){
+    var a=id?(state.apps.filter(function(x){return x.id===id})[0]||{}):{};
+    openDlg('<h2>'+(id?"Edit appearance":"Add appearance")+'</h2>'+appForm(a)+'<div class="err" id="aErr"></div><div class="row">'+(id?'<button class="btn" type="button" id="aDel">Delete</button>':'')+'<button class="btn" type="button" id="aCancel">Cancel</button><button class="btn primary" type="button" id="aSave">Save</button></div>');
+    $("aCancel").onclick=closeDlg;
+    $("fa").onsubmit=function(e){e.preventDefault();$("aSave").click()};
+    if(id)$("aDel").onclick=async function(){if($("aDel").dataset.armed!=="1"){$("aDel").dataset.armed="1";$("aDel").textContent="Confirm delete";return}try{await state.db.doc("appearances/"+id).delete();closeDlg();toast("Deleted")}catch(err){$("aErr").textContent=dbErr(err)}};
+    $("aSave").onclick=async function(){
+      var b=readApp();if(typeof b==="string"){$("aErr").textContent=b;return}
+      $("aSave").disabled=true;
+      try{if(id)await state.db.doc("appearances/"+id).set(b);else await state.db.collection("appearances").add(b);closeDlg();toast("Saved")}catch(err){$("aSave").disabled=false;$("aErr").textContent=dbErr(err)}
+    };
+  }
+
+  // speaker list check
+  function norm(s){return String(s).toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z\s.\-]/g," ")}
+  function localMatch(text){
+    var T=norm(text),out=[];
+    state.profs.forEach(function(p){
+      var forms=[p.name].concat(p.aliases||[]),hit=null;
+      forms.forEach(function(f){
+        if(hit)return;var parts=norm(f).replace(/\./g," ").split(/\s+/).filter(Boolean);if(!parts.length)return;
+        var last=parts[parts.length-1],first=parts[0];
+        var re=new RegExp("\\b"+last.replace(/[-]/g,"\\-")+"\\b","g"),m;
+        while((m=re.exec(T))){
+          var win=T.slice(Math.max(0,m.index-40),m.index+last.length+40);
+          if(parts.length===1||new RegExp("\\b"+first+"\\b").test(win)||new RegExp("\\b"+first[0]+"[\\s.]").test(win)){hit={idx:m.index,ctx:text.slice(Math.max(0,m.index-50),m.index+last.length+50)};break}
+        }
+      });
+      if(hit)out.push({profId:p.id,ctx:hit.ctx.replace(/\s+/g," ").trim(),how:"Name match"});
+    });
+    return out;
+  }
+  function openImport(){
+    openDlg('<h2>Check a speaker list</h2><p class="note" style="margin:0">Paste a conference program, speaker list or invited speakers page. Every tracked professor named in it is listed below for you to confirm, then saved as an appearance at this conference.</p>'+
+      '<form class="form" id="fi"><label class="full" for="iConf">Conference<input id="iConf" placeholder="e.g. ICBE 2027"></label>'+
+      '<label for="iStart">Start date<input id="iStart" placeholder="2027-03-02"></label><label for="iEnd">End date<input id="iEnd" placeholder="2027-03-05"></label>'+
+      '<label for="iCity">City<input id="iCity"></label><label for="iCountry">Country<input id="iCountry"></label>'+
+      '<label class="full" for="iSrc">Source link<input id="iSrc" type="url" placeholder="Page the list came from"></label>'+
+      '<label class="full" for="iText">Speaker list text<textarea id="iText" placeholder="Paste here"></textarea></label></form>'+
+      '<div class="row" style="justify-content:flex-start"><button class="btn" type="button" id="iFind">Find tracked professors</button>'+(state.sample?'<button class="btn" type="button" id="iAi">Ask Claude to check name variants</button>':'')+'</div>'+
+      '<div id="iRes"></div><div class="err" id="iErr"></div><div class="row"><button class="btn" type="button" id="iCancel">Close</button><button class="btn primary" type="button" id="iSave" disabled>Save selected</button></div>');
+    $("iCancel").onclick=closeDlg;
+    var found=[];
+    function show(){
+      if(!found.length){$("iRes").innerHTML='<div class="note">No tracked professors found in this text.</div>';$("iSave").disabled=true;return}
+      $("iRes").innerHTML='<div class="matches">'+found.map(function(f,i){return '<label for="im'+i+'"><input type="checkbox" id="im'+i+'" checked><span><strong>'+esc(profName(f.profId))+'</strong> <span class="note">'+esc(f.how)+'</span><br><span class="ctx">'+esc(f.ctx)+'</span></span></label>'}).join("")+'</div>';
+      $("iSave").disabled=false;
+    }
+    $("iFind").onclick=function(){var t=$("iText").value;if(!t.trim()){$("iErr").textContent="Paste the speaker list first.";return}$("iErr").textContent="";found=localMatch(t);show()};
+    if(state.sample)$("iAi").onclick=async function(){
+      var t=$("iText").value;if(!t.trim()){$("iErr").textContent="Paste the speaker list first.";return}
+      $("iAi").disabled=true;$("iAi").textContent="Checking...";$("iErr").textContent="";
+      try{
+        var roster=state.profs.map(function(p){return {id:p.id,name:p.name,affiliation:p.affiliation||"",aliases:p.aliases||[]}});
+        var res=await state.sample.json("You check whether specific researchers appear in a conference speaker list. Only report a person if the text clearly names them (allow initials, middle names, accents, hyphenation, a changed affiliation). Do not guess. Return JSON: {\"matches\":[{\"id\":\"<roster id>\",\"quote\":\"<exact short excerpt from the text naming them>\",\"role\":\"<one of: "+ROLES.join(", ")+">\"}]}.\n\nROSTER:\n"+JSON.stringify(roster)+"\n\nTEXT:\n"+t.slice(0,60000),{modelTier:"default"});
+        var ms=(res&&res.matches)||[];
+        ms.forEach(function(m){if(!prof(m.id))return;if(t.indexOf(m.quote||"\u0000")<0&&norm(t).indexOf(norm(m.quote||"\u0000"))<0)return;var ex=found.filter(function(f){return f.profId===m.id})[0];if(ex){ex.role=m.role;return}found.push({profId:m.id,ctx:m.quote,how:"Claude match, check it",role:m.role})});
+        show();
+      }catch(err){$("iErr").textContent=err&&err.code==="rate_limited"?"Too many requests. Wait a minute and try again.":"Claude could not check this text. The name match above still works."}
+      $("iAi").disabled=false;$("iAi").textContent="Ask Claude to check name variants";
+    };
+    $("iSave").onclick=async function(){
+      var conf=val("iConf");if(!conf){$("iErr").textContent="Enter the conference name.";return}
+      var s=val("iStart"),e=val("iEnd"),src=val("iSrc");
+      if(!validDate(s)||!validDate(e)){$("iErr").textContent="Dates must look like 2027, 2027-03 or 2027-03-02.";return}
+      if(src&&!/^https?:\/\//i.test(src)){$("iErr").textContent="Source link must start with http:// or https://.";return}
+      $("iSave").disabled=true;var n=0;
+      try{for(var i=0;i<found.length;i++){if(!$("im"+i).checked)continue;
+        await state.db.collection("appearances").add({profId:found[i].profId,conference:conf,startDate:s,endDate:e,city:val("iCity"),country:val("iCountry"),role:found[i].role&&ROLES.indexOf(found[i].role)>=0?found[i].role:"Unknown",confidence:src?"Confirmed":"Reported",sourceUrl:src,notes:"From speaker list: "+found[i].ctx.slice(0,160),updatedAt:new Date().toISOString()});n++}
+        closeDlg();toast(n+" appearances saved")}catch(err){$("iSave").disabled=false;$("iErr").textContent=dbErr(err)}
+    };
+  }
+
+  // CSV
+  function csv(){
+    var head=["Professor","Affiliation","Conference","Start","End","City","Country","Role","Evidence","Status","Source","Notes"];
+    var q=function(v){v=String(v==null?"":v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+    return [head.join(",")].concat(filtered().map(function(a){var p=prof(a.profId)||{};return [p.name,p.affiliation,a.conference,a.startDate,a.endDate,a.city,a.country,a.role,a.confidence,STAT[status(a)],a.sourceUrl,a.notes].map(q).join(",")})).join("\n");
+  }
+  $("btnCsv").onclick=async function(){
+    var c=csv();
+    try{download("conference-appearances.csv",c,"text/csv");toast("CSV of the "+filtered().length+" shown rows downloaded")}
+    catch(e){openDlg('<h2>Copy CSV</h2><p class="note" style="margin:0">Select all and copy.</p><div class="form"><label class="full" for="csvOut">CSV<textarea id="csvOut" style="min-height:240px">'+esc(c)+'</textarea></label></div><div class="row"><button class="btn" type="button" id="cClose">Close</button></div>');$("cClose").onclick=closeDlg}
+  };
+  $("btnAddProf").onclick=function(){openProf()};
+  $("btnAddApp").onclick=function(){openApp()};
+  $("btnImport").onclick=openImport;
+
+  // data: data/tracker.js (built from data/tracker.json) + this browser's unsaved edits
+  var LS="labConfTracker.edits.v1";
+  function setStatus(html){$("status").innerHTML=html}
+  function persist(){try{localStorage.setItem(LS,JSON.stringify({base:sig(SEED),profs:state.profs,apps:state.apps,savedAt:new Date().toISOString()}));state.dirty=true}catch(e){}showBanner()}
+  function showBanner(){
+    var saved=state.savedAt?' Last change '+esc(state.savedAt.slice(0,10))+'.':'';
+    if(!window.TRACKER_DATA){setStatus('<div class="banner warn">Could not load data/tracker.js. Keep index.html next to the data folder.</div>');return}
+    if(state.stale)setStatus('<div class="banner warn">The lab data was updated after you made local edits, so this page shows the new lab data. <button class="btn link" type="button" id="bOld">Show my old edits</button> (then Export them and compare) or <button class="btn link" type="button" id="bReset">discard them</button>.</div>');
+    else if(state.dirty)setStatus('<div class="banner warn">You have edits saved in this browser only.'+saved+' To share them: <strong>Export data</strong>, then upload the file to GitHub as data/tracker.json (see About). <button class="btn link" type="button" id="bReset">Discard my edits</button></div>');
+    else setStatus("");
+    var o=$("bOld");if(o)o.onclick=function(){try{var d=JSON.parse(localStorage.getItem(LS));load(d);state.stale=false;state.dirty=true;state.savedAt=d.savedAt||"";showBanner();render()}catch(e){}};
+    var r=$("bReset");if(r)r.onclick=function(){if(r.dataset.armed!=="1"){r.dataset.armed="1";r.textContent="Click again to discard all local edits";return}try{localStorage.removeItem(LS)}catch(e){}load(SEED);state.dirty=false;state.stale=false;showBanner();render();toast("Back to the original data")};
+  }
+  function findIdx(arr,id){for(var i=0;i<arr.length;i++)if(arr[i].id===id)return i;return -1}
+  state.db={
+    doc:function(path){var p=path.split("/"),col=p[0],id=p[1];var arr=function(){return col==="profs"?state.profs:state.apps};return{
+      set:async function(b){var x=Object.assign({},b,{id:id});if(col==="profs")x.name=x.name||id;var a=arr(),i=findIdx(a,id);if(i>=0)a[i]=x;else a.push(x);state.savedAt=new Date().toISOString();persist();render()},
+      delete:async function(){var a=arr(),i=findIdx(a,id);if(i>=0)a.splice(i,1);state.savedAt=new Date().toISOString();persist();render()}}},
+    collection:function(col){return{add:async function(b){var id="a"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);return state.db.doc(col+"/"+id).set(b)}}}
+  };
+  function load(d){state.profs=(d.profs||[]).map(function(x){return Object.assign({},x)});state.apps=(d.apps||[]).map(function(x){return Object.assign({},x)})}
+  var SEED=window.TRACKER_DATA||{profs:[],apps:[],generated:"",geo:{}};
+  var GEO=SEED.geo||{};
+  function sig(d){return (d.generated||"")+"|"+(d.profs||[]).length+"|"+(d.apps||[]).length}
+  load(SEED);
+  try{var raw=localStorage.getItem(LS);if(raw){var d=JSON.parse(raw);if(d&&d.profs&&d.apps){if(d.base===sig(SEED)){load(d);state.dirty=true;state.savedAt=d.savedAt||""}else{state.stale=true}}}}catch(e){}
+  $("dataDate").textContent=SEED.generated?"· data updated "+SEED.generated:"";
+  state.loaded=true;
+  function download(name,text,type){var blob=new Blob([text],{type:type});var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500)}
+  $("btnExport").onclick=function(){download("tracker.json",JSON.stringify({generated:new Date().toISOString().slice(0,10),profs:state.profs,apps:state.apps},null,2)+"\n","application/json");toast("Data exported")};
+  $("btnImportData").onclick=function(){$("fileIn").click()};
+  $("fileIn").onchange=function(e){var f=e.target.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){try{var d=JSON.parse(rd.result);if(!d.profs||!d.apps)throw 0;load(d);state.savedAt=new Date().toISOString();persist();render();toast("Loaded "+d.apps.length+" appearances")}catch(err){toast("That file is not tracker data")}e.target.value=""};rd.readAsText(f)};
+  showBanner();
+  route();
+})();
+</script>
+</body>
+</html>

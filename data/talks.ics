@@ -1,0 +1,285 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Lab Conference Tracker//EN
+CALSCALE:GREGORIAN
+X-WR-CALNAME:Professors of interest: conference talks
+BEGIN:VEVENT
+UID:vib21-ovch@lab-conference-tracker
+DTSTAMP:20210908T000000Z
+DTSTART;VALUE=DATE:20210908
+DTEND;VALUE=DATE:20210911
+SUMMARY:Sergey Ovchinnikov at VIB Nanobodies (2nd edition\, hybrid)
+LOCATION:Brussels\, Belgium
+DESCRIPTION:Invited talk (Confirmed). Hybrid meeting\; may have presented remotely Source: https://vibconferences.be/speaker/sergey-ovchinnikov
+END:VEVENT
+BEGIN:VEVENT
+UID:ips23-jackson@lab-conference-tracker
+DTSTAMP:20231015T000000Z
+DTSTART;VALUE=DATE:20231015
+DTEND;VALUE=DATE:20231021
+SUMMARY:Colin J. Jackson at 13th International Peptide Symposium (with 15th Australian Peptide Conference)
+LOCATION:Brisbane\, Australia
+DESCRIPTION:Unknown (Confirmed). Oral talk\, Session 4 Bioactive peptide design (incl. ML): Peptide design through machine learning Source: https://ips-2023.m.asnevents.com.au/schedule/author/519999
+END:VEVENT
+BEGIN:VEVENT
+UID:ips23-vdd@lab-conference-tracker
+DTSTAMP:20231015T000000Z
+DTSTART;VALUE=DATE:20231015
+DTEND;VALUE=DATE:20231021
+SUMMARY:Wilfred van der Donk at 13th International Peptide Symposium (with 15th Australian Peptide Conference)
+LOCATION:Brisbane\, Australia
+DESCRIPTION:Unknown (Confirmed). Listed as presenting speaker\; talk title not captured Source: https://ips-2023.p.asnevents.com.au/speaker/507611
+END:VEVENT
+BEGIN:VEVENT
+UID:vib24-ovch@lab-conference-tracker
+DTSTAMP:20240307T000000Z
+DTSTART;VALUE=DATE:20240307
+DTEND;VALUE=DATE:20240309
+SUMMARY:Sergey Ovchinnikov at VIB Applied Bioinformatics in Life Sciences (5th edition)
+LOCATION:Leuven\, Belgium
+DESCRIPTION:Invited talk (Confirmed).  Source: https://vibconferences.be/speaker/sergey-ovchinnikov
+END:VEVENT
+BEGIN:VEVENT
+UID:aptdasia24-koide@lab-conference-tracker
+DTSTAMP:20240326T000000Z
+DTSTART;VALUE=DATE:20240326
+DTEND;VALUE=DATE:20240327
+SUMMARY:Shohei Koide at Antibody & Protein Therapeutic Discovery Asia (digital day)
+LOCATION:Online
+DESCRIPTION:Invited talk (Confirmed). Targeting intracellular disease drivers with biologics Source: https://informaconnect.com/bispecifics-asia/speakers/shohei-koide-phd
+END:VEVENT
+BEGIN:VEVENT
+UID:boden24-jackson@lab-conference-tracker
+DTSTAMP:20240925T000000Z
+DTSTART;VALUE=DATE:20240925
+DTEND;VALUE=DATE:20240927
+SUMMARY:Colin J. Jackson at Australian Academy of Science Boden Research Conference 2024: Protein Folding
+LOCATION:Sydney\, Australia
+DESCRIPTION:Unknown (Reported). Has a speaker profile page on the conference site\; role not stated Source: https://boden-conference-24.sydney.edu.au/?p=218
+END:VEVENT
+BEGIN:VEVENT
+UID:aetasia24-koide@lab-conference-tracker
+DTSTAMP:20241021T000000Z
+DTSTART;VALUE=DATE:20241021
+DTEND;VALUE=DATE:20241024
+SUMMARY:Shohei Koide at Antibody Engineering & Therapeutics Asia 2024
+LOCATION:Kyoto\, Japan
+DESCRIPTION:Invited talk (Confirmed). Westin Miyako Kyoto\, hybrid Source: https://informaconnect.com/antibody-engineering-therapeutics-asia/speakers/shohei-koide-phd
+END:VEVENT
+BEGIN:VEVENT
+UID:jps61-murakami@lab-conference-tracker
+DTSTAMP:20241029T000000Z
+DTSTART;VALUE=DATE:20241029
+DTEND;VALUE=DATE:20241101
+SUMMARY:Hiroshi Murakami at 61st Japanese Peptide Symposium
+LOCATION:Nagoya\, Japan
+DESCRIPTION:Organiser (Confirmed). Symposium chair (with Gosuke Hayashi)\; gave opening remarks. Toyoda Auditorium\, Nagoya University Source: https://peptide-soc.jp/61jps/en
+END:VEVENT
+BEGIN:VEVENT
+UID:pmwc25-bertozzi@lab-conference-tracker
+DTSTAMP:20250205T000000Z
+DTSTART;VALUE=DATE:20250205
+DTEND;VALUE=DATE:20250208
+SUMMARY:Carolyn Bertozzi at Precision Medicine World Conference (PMWC) 2025 Silicon Valley
+LOCATION:Santa Clara\, USA
+DESCRIPTION:Keynote (Confirmed). Luminary Award honoree\; keynote on bioorthogonal chemistry to clinical translation Source: https://pmwcintl.com/speaker/carolyn-bertozzi-27_stanford_2025sv
+END:VEVENT
+BEGIN:VEVENT
+UID:pmwc25-liu@lab-conference-tracker
+DTSTAMP:20250205T000000Z
+DTSTART;VALUE=DATE:20250205
+DTEND;VALUE=DATE:20250208
+SUMMARY:David R. Liu at Precision Medicine World Conference (PMWC) 2025 Silicon Valley
+LOCATION:Santa Clara\, USA
+DESCRIPTION:Keynote (Confirmed). Luminary Award honoree\; keynote on base editing\, prime editing and targeted gene integration Source: https://pmwcintl.com/speaker/david-liu-76_broad-institute_2025sv
+END:VEVENT
+BEGIN:VEVENT
+UID:csj105-murakami@lab-conference-tracker
+DTSTAMP:20250329T000000Z
+DTSTART;VALUE=DATE:20250329
+DTEND;VALUE=DATE:20250330
+SUMMARY:Hiroshi Murakami at Chemical Society of Japan 105th Annual Meeting
+LOCATION:Japan
+DESCRIPTION:Invited talk (Confirmed). Special symposium talk: Development of novel technologies through antibody-like proteins Source: https://pub-files.atlas.jp/fs/public/csj105th/ver_28/session/ja/4G_320101-05.pdf
+END:VEVENT
+BEGIN:VEVENT
+UID:gen25-zhang@lab-conference-tracker
+DTSTAMP:20250611T000000Z
+DTSTART;VALUE=DATE:20250611
+DTEND;VALUE=DATE:20250612
+SUMMARY:Feng Zhang at GEN: The State of CRISPR and Genome Editing (virtual summit)
+LOCATION:Online
+DESCRIPTION:Keynote (Confirmed). Opening keynote Source: https://www.genengnews.com/topics/genome-editing/feng-zhang-explores-natural-diversity-for-human-health/
+END:VEVENT
+BEGIN:VEVENT
+UID:bio25-zhang@lab-conference-tracker
+DTSTAMP:20250617T000000Z
+DTSTART;VALUE=DATE:20250617
+DTEND;VALUE=DATE:20250618
+SUMMARY:Feng Zhang at BIO International Convention 2025
+LOCATION:Boston\, USA
+DESCRIPTION:Panel (Confirmed). Fireside chat\, Next Generation Biotherapeutics track. City from general knowledge of BIO 2025\, not stated on the session page Source: https://convention.bio.org/program-1/fireside-chat-feng-zhang-co-founder-moonwalk-biosciences
+END:VEVENT
+BEGIN:VEVENT
+UID:fins25-lavis@lab-conference-tracker
+DTSTAMP:20251006T000000Z
+DTSTART;VALUE=DATE:20251006
+DTEND;VALUE=DATE:20251010
+SUMMARY:Luke D. Lavis at Frontiers in Neurophotonics Symposium (FINS 2025)
+LOCATION:Bordeaux\, France
+DESCRIPTION:Invited talk (Confirmed). Centre Broca Source: https://www.bordeaux-neurocampus.fr/wp-content/uploads/2024/10/Abstract-Book-FINS-2025-4.pdf
+END:VEVENT
+BEGIN:VEVENT
+UID:nobel61-bertozzi@lab-conference-tracker
+DTSTAMP:20251007T000000Z
+DTSTART;VALUE=DATE:20251007
+DTEND;VALUE=DATE:20251009
+SUMMARY:Carolyn Bertozzi at Nobel Conference 61: Sugar
+LOCATION:St. Peter\, Minnesota\, USA
+DESCRIPTION:Invited talk (Confirmed). Lecture: Glycans\, the sugars coating our cells. Gustavus Adolphus College Source: https://gustavus.edu/events/nobelconference/2025/speakers/bertozzi.php
+END:VEVENT
+BEGIN:VEVENT
+UID:lorne26-jackson@lab-conference-tracker
+DTSTAMP:20260208T000000Z
+DTSTART;VALUE=DATE:20260208
+DTEND;VALUE=DATE:20260213
+SUMMARY:Colin J. Jackson at 51st Lorne Proteins Conference 2026
+LOCATION:Lorne\, Australia
+DESCRIPTION:Poster (Confirmed). Poster Session D\, 10 Feb: Navigating and smoothing complex protein fitness landscapes for generative design Source: https://proteins-2026.p.asnevents.com.au/speaker/751059
+END:VEVENT
+BEGIN:VEVENT
+UID:jointmtg26-liu@lab-conference-tracker
+DTSTAMP:20260417T000000Z
+DTSTART;VALUE=DATE:20260417
+DTEND;VALUE=DATE:20260420
+SUMMARY:David R. Liu at AAP/ASCI/APSA Joint Meeting 2026
+LOCATION:Chicago\, USA
+DESCRIPTION:Plenary (Confirmed). Plenary Session III\, gene editing state of the art Source: https://www.jointmeeting.org/2026/speaker/2255056/david-liu
+END:VEVENT
+BEGIN:VEVENT
+UID:bower26-liu@lab-conference-tracker
+DTSTAMP:20260429T000000Z
+DTSTART;VALUE=DATE:20260429
+DTEND;VALUE=DATE:20260430
+SUMMARY:David R. Liu at Bower Award Symposium on base and prime editing (Penn)
+LOCATION:Philadelphia\, USA
+DESCRIPTION:Keynote (Confirmed). Symposium honouring his 2026 Franklin Institute Bower Award Source: https://fi.edu/sites/default/files/2026-04/Liu-Symposium-042926.pdf
+END:VEVENT
+BEGIN:VEVENT
+UID:icml26-bronstein@lab-conference-tracker
+DTSTAMP:20260706T000000Z
+DTSTART;VALUE=DATE:20260706
+DTEND;VALUE=DATE:20260712
+SUMMARY:Alex M. Bronstein at ICML 2026
+LOCATION:Seoul\, South Korea
+DESCRIPTION:Unknown (Unverified). Group's follow-up paper accepted to ICML 2026\; personal attendance not confirmed Source: https://ista.ac.at/en/news/toward-experiment-guided-alphafold/
+END:VEVENT
+BEGIN:VEVENT
+UID:ps40-jackson@lab-conference-tracker
+DTSTAMP:20260719T000000Z
+DTSTART;VALUE=DATE:20260719
+DTEND;VALUE=DATE:20260723
+SUMMARY:Colin J. Jackson at Protein Society 40th Anniversary Symposium (PS40)
+LOCATION:Boston\, USA
+DESCRIPTION:Invited talk (Confirmed). Session 12\, Proteins in Agriculture\, 22 Jul: Enthalpy-entropy trade-offs in the evolution of ligand specificity in a superfamily of transcription factors Source: https://ps.memberclicks.net/daily-program-ps40
+END:VEVENT
+BEGIN:VEVENT
+UID:ps40-koide@lab-conference-tracker
+DTSTAMP:20260719T000000Z
+DTSTART;VALUE=DATE:20260719
+DTEND;VALUE=DATE:20260723
+SUMMARY:Shohei Koide at Protein Society 40th Anniversary Symposium (PS40)
+LOCATION:Boston\, USA
+DESCRIPTION:Invited talk (Confirmed). Session 2\, Engineering Protein Biologics\, 19 Jul: Direct and selective targeting of cancer-driver mutants with synthetic binding proteins Source: https://ps.memberclicks.net/daily-program-ps40
+END:VEVENT
+BEGIN:VEVENT
+UID:eps26-suga@lab-conference-tracker
+DTSTAMP:20260906T000000Z
+DTSTART;VALUE=DATE:20260906
+DTEND;VALUE=DATE:20260912
+SUMMARY:Hiroaki Suga at 38th European Peptide Symposium (EPS 2026)
+LOCATION:Vienna\, Austria
+DESCRIPTION:Plenary (Confirmed). Plenary 2\, Tue 8 Sep 08:30\, with Gong Chen and Steven Ballet Source: https://airdrive.eventsair.com/eventsairwesteuprod/production-univie-public/a712793485d2416d95770e9aee840985
+END:VEVENT
+BEGIN:VEVENT
+UID:eps26-vdd@lab-conference-tracker
+DTSTAMP:20260906T000000Z
+DTSTART;VALUE=DATE:20260906
+DTEND;VALUE=DATE:20260912
+SUMMARY:Wilfred van der Donk at 38th European Peptide Symposium (EPS 2026)
+LOCATION:Vienna\, Austria
+DESCRIPTION:Session chair (Confirmed). Chair\, Session 12 Peptide and protein engineering\, Thu 10 Sep Source: https://airdrive.eventsair.com/eventsairwesteuprod/production-univie-public/a712793485d2416d95770e9aee840985
+END:VEVENT
+BEGIN:VEVENT
+UID:crb60-bertozzi@lab-conference-tracker
+DTSTAMP:20261009T000000Z
+DTSTART;VALUE=DATE:20261009
+DTEND;VALUE=DATE:20261010
+SUMMARY:Carolyn Bertozzi at CRB60: Symposium celebrating Carolyn Bertozzi
+LOCATION:Stanford\, USA
+DESCRIPTION:Attendee (Reported). Honoree of the symposium (60th birthday) Source: https://chemistry.stanford.edu/events/crb60-symposium-celebrating-carolyn-bertozzis-legacy-and-impact-chemical-biology
+END:VEVENT
+BEGIN:VEVENT
+UID:icbs26-bertozzi@lab-conference-tracker
+DTSTAMP:20261012T000000Z
+DTSTART;VALUE=DATE:20261012
+DTEND;VALUE=DATE:20261016
+SUMMARY:Carolyn Bertozzi at International Chemical Biology Society (ICBS) 2026 Annual Conference
+LOCATION:San Francisco\, USA
+DESCRIPTION:Keynote (Confirmed). Tue 13 Oct 9:00: Bioorthogonal chemistry and new therapeutic modalities. Meeting presented by UCSF\; city inferred from host Source: https://cdn.ymaws.com/www.chemical-biology.org/resource/resmgr/2026_meeting/agenda_icbs2026.pdf
+END:VEVENT
+BEGIN:VEVENT
+UID:natprecmed26-zhang@lab-conference-tracker
+DTSTAMP:20261013T000000Z
+DTSTART;VALUE=DATE:20261013
+DTEND;VALUE=DATE:20261016
+SUMMARY:Feng Zhang at Nature Conferences: Precision Medicine 2026
+LOCATION:London\, UK
+DESCRIPTION:Keynote (Confirmed). Keynote 3\, Precision Editing session\, 15 Oct. The Royal Institution Source: https://precision-medicine.conferences.nature.com/2026-agenda/precision-editing
+END:VEVENT
+BEGIN:VEVENT
+UID:keystone27-liu@lab-conference-tracker
+DTSTAMP:20270101T000000Z
+DTSTART;VALUE=DATE:20270101
+DTEND;VALUE=DATE:20270105
+SUMMARY:David R. Liu at Keystone Symposia: Precision Genome Engineering\, From Laboratory to Clinic
+LOCATION:Location TBD
+DESCRIPTION:Keynote (Confirmed). Joint keynote\, Sun 3 Jan: Development and application of virus-like particles for genome editing in vivo. Venue not yet announced Source: https://www.keystonesymposia.org/conferences/conference-listing/meeting/onpage-program/X22027
+END:VEVENT
+BEGIN:VEVENT
+UID:keystone27-zhang@lab-conference-tracker
+DTSTAMP:20270101T000000Z
+DTSTART;VALUE=DATE:20270101
+DTEND;VALUE=DATE:20270105
+SUMMARY:Feng Zhang at Keystone Symposia: Precision Genome Engineering\, From Laboratory to Clinic
+LOCATION:Location TBD
+DESCRIPTION:Invited talk (Confirmed). Mon 4 Jan session: Non-canonical CRISPR systems for genome editing. Venue not yet announced Source: https://www.keystonesymposia.org/conferences/conference-listing/meeting/onpage-program/X22027
+END:VEVENT
+BEGIN:VEVENT
+UID:pegsai27-gray@lab-conference-tracker
+DTSTAMP:20270119T000000Z
+DTSTART;VALUE=DATE:20270119
+DTEND;VALUE=DATE:20270122
+SUMMARY:Jeffrey J. Gray at PEGS AI 2027 (co-located with PepTalk)
+LOCATION:Carlsbad\, USA
+DESCRIPTION:Keynote (Confirmed). Thu 21 Jan 8:40: AI vs physics for protein engineering. Site lists dates as both Jan 18-21 and Jan 19-22 Source: https://www.pegsummit.com/pegs-ai/keynotes
+END:VEVENT
+BEGIN:VEVENT
+UID:pegsai27-ovch@lab-conference-tracker
+DTSTAMP:20270119T000000Z
+DTSTART;VALUE=DATE:20270119
+DTEND;VALUE=DATE:20270122
+SUMMARY:Sergey Ovchinnikov at PEGS AI 2027 (co-located with PepTalk)
+LOCATION:Carlsbad\, USA
+DESCRIPTION:Keynote (Confirmed). Keynote session talk Wed 20 Jan 12:05\, plus Q&A panel Source: https://www.pegsummit.com/pegs-ai/keynotes
+END:VEVENT
+BEGIN:VEVENT
+UID:tidesasia27-suga@lab-conference-tracker
+DTSTAMP:20270224T000000Z
+DTSTART;VALUE=DATE:20270224
+DTEND;VALUE=DATE:20270227
+SUMMARY:Hiroaki Suga at TIDES Asia: Oligonucleotide and Peptide Therapeutics 2027
+LOCATION:Tokyo\, Japan
+DESCRIPTION:Invited talk (Confirmed). Grand Nikko Tokyo Daiba Source: https://informaconnect.com/asia-tides/speakers/hiroaki-suga-phd/
+END:VEVENT
+END:VCALENDAR
