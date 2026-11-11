@@ -282,4 +282,13 @@ SUMMARY:Hiroaki Suga at TIDES Asia: Oligonucleotide and Peptide Therapeutics 202
 LOCATION:Tokyo\, Japan
 DESCRIPTION:Invited talk (Confirmed). Grand Nikko Tokyo Daiba Source: https://informaconnect.com/asia-tides/speakers/hiroaki-suga-phd/
 END:VEVENT
+BEGIN:VEVENT
+UID:aps-2027-wilfred-van-der-donk@lab-conference-tracker
+DTSTAMP:20270620T000000Z
+DTSTART;VALUE=DATE:20270620
+DTEND;VALUE=DATE:20270625
+SUMMARY:Wilfred van der Donk at 30th American Peptide Symposium
+LOCATION:Boston\, USA
+DESCRIPTION:Session chair (Unverified). Auto-found 2026-11-11: ...t … Oct 8\, 2026 Sponsor or Exhibit at APS 2027 Put your organization in front of the peptide community in Boston\, June 20–24\, … Oct 1\, 2026 Wilfred van der Donk Recognized Wilfred A. van der Donk\, Richard E. Heckert E Source: https://www.americanpeptidesociety.org/
+END:VEVENT
 END:VCALENDAR

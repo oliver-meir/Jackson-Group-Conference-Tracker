@@ -621,6 +621,20 @@
       "confidence": "Confirmed",
       "sourceUrl": "https://vibconferences.be/speaker/sergey-ovchinnikov",
       "notes": ""
+    },
+    {
+      "id": "aps-2027-wilfred-van-der-donk",
+      "profId": "wilfred-van-der-donk",
+      "watchId": "aps-2027",
+      "conference": "30th American Peptide Symposium",
+      "startDate": "2027-06-20",
+      "endDate": "2027-06-24",
+      "city": "Boston",
+      "country": "USA",
+      "role": "Session chair",
+      "confidence": "Unverified",
+      "sourceUrl": "https://www.americanpeptidesociety.org/",
+      "notes": "Auto-found 2026-11-11: ...t … Oct 8, 2026 Sponsor or Exhibit at APS 2027 Put your organization in front of the peptide community in Boston, June 20–24, … Oct 1, 2026 Wilfred van der Donk Recognized Wilfred A. van der Donk, Richard E. Heckert E"
     }
   ]
 }
