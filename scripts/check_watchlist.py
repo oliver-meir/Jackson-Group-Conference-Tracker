@@ -15,6 +15,7 @@ import difflib
 import hashlib
 import io
 import json
+import os
 import re
 import sys
 import time
@@ -28,6 +29,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from matcher import find_all, normalise  # noqa: E402
 from editions import describe_edition, expand_series, site_furniture  # noqa: E402
 import build_outputs  # noqa: E402
+import photos  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
@@ -38,7 +40,7 @@ REPORT = ROOT / "report.md"
 WATCHLIST = ROOT / "watchlist.yaml"
 SERIES = DATA / "conferences.json"
 
-USER_AGENT = "LabConferenceTracker/1.0 (academic, weekly check; contact via repo)"
+USER_AGENT = "LabConferenceTracker/1.0 (academic conference tracker; https://github.com/" + os.environ.get("GITHUB_REPOSITORY", "oliver-meir/Jackson-Group-Conference-Tracker") + ")"
 EVENT_WORDS = r"\b(symposium|conference|congress|meeting|keynote|plenary|invited|workshop|summit|lecture|talk|speaker|gordon|keystone)\b"
 
 
@@ -111,6 +113,19 @@ def refresh_row(apps, prof_id, watch, start, end_, city, country):
             a.update(new)
             return True
         return False
+
+
+def _wm_json(url, params):
+    """Wikimedia API call (they ask for a descriptive User-Agent)."""
+    r = requests.get(url, params=params, headers={"User-Agent": USER_AGENT}, timeout=30)
+    r.raise_for_status()
+    return r.json()
+
+
+def _wm_bytes(url):
+    r = requests.get(url, headers={"User-Agent": USER_AGENT}, timeout=60)
+    r.raise_for_status()
+    return r.content, r.headers.get("content-type", "")
 
 
 def _not_published(exc) -> bool:
@@ -295,6 +310,7 @@ def main(argv=None) -> int:
     ap.add_argument("--dry-run", action="store_true", help="do not write any files except report.md")
     ap.add_argument("--from-dir", type=Path, help="read page text from local files named <id>.html/.txt/.pdf")
     ap.add_argument("--no-geocode", action="store_true")
+    ap.add_argument("--no-photos", action="store_true", help="skip looking up professor photos on Wikidata")
     ap.add_argument("--only", help="check just this professor id (used when someone adds a professor on the website)")
     ap.add_argument("--conference", help="check just this conference series id from data/conferences.json, for every professor")
     args = ap.parse_args(argv)
@@ -341,7 +357,9 @@ def main(argv=None) -> int:
                 p["lastChecked"] = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
                 p["lastCheckHits"] = len(new_rows)
                 p["lastCheckErrors"] = len(errors)
-    if new_rows or args.only or report.get("refreshed"):
+    if not args.from_dir and not args.no_photos and not args.conference:
+        report["photos"] = photos.fill_photos(tracker["profs"], ROOT / "photos", _wm_json, _wm_bytes, only=args.only)
+    if new_rows or args.only or report.get("refreshed") or report.get("photos"):
         save_json(TRACKER, tracker)
     if not args.only and editions:
         now = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")

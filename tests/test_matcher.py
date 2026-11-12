@@ -254,3 +254,67 @@ def test_series_ignores_site_menu_and_fixes_old_rows(tmp_path, monkeypatch):
     assert "start" not in eds["2027"] and "city" not in eds["2027"]  # menu dates/cities never leak in
     row = next(a for a in json.loads((repo / "data" / "tracker.json").read_text())["apps"] if a["id"] == "seed-2026-hiroaki-suga")
     assert (row["startDate"], row["endDate"], row["city"], row["country"]) == ("2026-06-15", "2026-06-18", "Denver", "USA")
+
+
+def _fake_wikimedia(people, orgs=None):
+    """people: {qid: (label, description, [employer qids], image or None)}"""
+    orgs = orgs or {}
+
+    def get_json(url, params):
+        if params.get("action") == "wbsearchentities":
+            return {"search": [{"id": q} for q, v in people.items() if v[0].lower() == params["search"].lower()]}
+        if params.get("action") == "wbgetentities":
+            out = {}
+            for q in params["ids"].split("|"):
+                if q in people:
+                    label, desc, emp, img = people[q]
+                    claims = {"P31": [{"mainsnak": {"datavalue": {"value": {"id": "Q5"}}}}],
+                              "P108": [{"mainsnak": {"datavalue": {"value": {"id": e}}}} for e in emp]}
+                    if img:
+                        claims["P18"] = [{"mainsnak": {"datavalue": {"value": img}}}]
+                    out[q] = {"labels": {"en": {"value": label}}, "descriptions": {"en": {"value": desc}}, "claims": claims}
+                elif q in orgs:
+                    out[q] = {"labels": {"en": {"value": orgs[q]}}}
+            return {"entities": out}
+        if params.get("action") == "query":
+            return {"query": {"pages": {"1": {"imageinfo": [{"thumburl": "https://upload.example/x.jpg",
+                    "descriptionurl": "https://commons.wikimedia.org/wiki/File:X.jpg",
+                    "extmetadata": {"Artist": {"value": "<a>Jane Photographer</a>"}, "LicenseShortName": {"value": "CC BY-SA 4.0"}}}]}}}}
+        raise AssertionError(params)
+    return get_json
+
+
+def test_photos_only_for_clear_matches(tmp_path):
+    from photos import fill_photos
+    people = {
+        "Q1": ("Huimin Zhao", "American chemical engineer", ["Q100"], "Zhao.jpg"),
+        "Q2": ("Huimin Zhao", "Chinese chemist", ["Q200"], "Other.jpg"),          # same name, other university
+        "Q3": ("Alex Smith", "British biologist", [], "Smith.jpg"),
+        "Q4": ("Alex Smith", "American physicist", [], "Smith2.jpg"),             # two, no university match: skip
+        "Q5": ("Pat Lee", "American footballer", [], "Lee.jpg"),                   # not a scientist: skip
+        "Q6": ("Robin Roe", "Australian biochemist", [], "Roe.jpg"),               # only one scientist: ok
+    }
+    orgs = {"Q100": "University of Illinois Urbana-Champaign", "Q200": "Peking University"}
+    profs = [{"id": "huimin-zhao", "name": "Huimin Zhao", "affiliation": "University of Illinois Urbana-Champaign"},
+             {"id": "alex-smith", "name": "Alex Smith", "affiliation": "ANU"},
+             {"id": "pat-lee", "name": "Pat Lee", "affiliation": "MIT"},
+             {"id": "robin-roe", "name": "Robin Roe", "affiliation": "Somewhere"},
+             {"id": "has-own", "name": "Robin Roe", "affiliation": "x"},
+             {"id": "removed", "name": "Robin Roe", "affiliation": "x", "photo": "none", "photoAuto": True}]
+    (tmp_path / "photos").mkdir()
+    (tmp_path / "photos" / "has-own.jpg").write_bytes(b"mine")
+    got = []
+    n = fill_photos(profs, tmp_path / "photos", _fake_wikimedia(people, orgs),
+                    lambda url: (got.append(url) or b"\xff\xd8" + b"0" * 5000, "image/jpeg"), log=lambda *_: None)
+    by = {p["id"]: p for p in profs}
+    assert by["huimin-zhao"]["photo"] == "huimin-zhao.jpg" and by["huimin-zhao"]["photoWikidata"] == "Q1"
+    assert by["huimin-zhao"]["photoCredit"] == "Jane Photographer, CC BY-SA 4.0 via Wikimedia Commons"
+    assert (tmp_path / "photos" / "huimin-zhao.jpg").exists()
+    assert "photo" not in by["alex-smith"] and by["alex-smith"]["photoChecked"]
+    assert "photo" not in by["pat-lee"]
+    assert by["robin-roe"]["photoWikidata"] == "Q6"
+    assert "photo" not in by["has-own"] and (tmp_path / "photos" / "has-own.jpg").read_bytes() == b"mine"
+    assert by["removed"]["photo"] == "none"
+    assert n == 4 and len(got) == 2
+    # next run within 30 days does not look again
+    assert fill_photos(profs, tmp_path / "photos", _fake_wikimedia(people, orgs), lambda u: 1 / 0, log=lambda *_: None) == 0

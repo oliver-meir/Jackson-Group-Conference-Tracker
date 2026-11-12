@@ -235,7 +235,7 @@ tr:last-child td{border-bottom:none}
 <ul>
 <li><strong>Check a speaker list:</strong> paste any program text to see which tracked professors are named in it, and save the matches.</li>
 <li><strong>Calendar:</strong> downloads all dated talks as an .ics file, or subscribe to <code>data/talks.ics</code> on this site in Outlook or Google Calendar.</li>
-<li><strong>Photos:</strong> add a square image to the repository's <code>photos</code> folder named after the professor's id, e.g. <code>photos/colin-jackson.jpg</code>. Use images you have permission to use.</li>
+<li><strong>Photos:</strong> found automatically on Wikidata/Wikimedia Commons (free licences, credited on each professor's page) when the match is clear: a scientist with that name who is the only one, or whose entry names their university. If no clear match, initials are shown. Wrong person? Click "Remove photo" on their page. To use your own photo, add it to the repository's <code>photos</code> folder named after the professor's id, e.g. <code>photos/colin-jackson.jpg</code>; your own photo always wins.</li>
 <li><strong>Map:</strong> where each professor has been (faint) and is going (filled).</li>
 </ul>
 <h2>Built with</h2>
@@ -267,7 +267,7 @@ tr:last-child td{border-bottom:none}
   function initials(name){var t=String(name||"").replace(/[^A-Za-z\u00C0-\u024F .-]/g,"").split(/\s+/).filter(function(w){return w&&!/^(van|der|den|de|von|da|di|le)$/i.test(w)&&w.length>1});return ((t[0]||"?")[0]+(t.length>1?t[t.length-1][0]:"")).toUpperCase()}
   // Photos: put photos/<professor id>.jpg (or .png) in the repo. Falls back to initials.
   window.avErr=function(img){if(/\.jpg$/.test(img.getAttribute("src"))){img.setAttribute("src",img.getAttribute("src").replace(/\.jpg$/,".png"))}else{img.remove()}};
-  function avatar(p,size){var fs=Math.round(size*0.38);return '<span class="av" style="width:'+size+'px;height:'+size+'px;font-size:'+fs+'px" aria-hidden="true">'+initials(p.name)+'<img src="photos/'+esc(p.photo||p.id)+(p.photo?"":".jpg")+'" alt="" loading="lazy" onerror="avErr(this)"></span>'}
+  function avatar(p,size){var fs=Math.round(size*0.38);var img=p.photo==="none"?"":'<img src="photos/'+esc(p.photo||p.id)+(p.photo?"":".jpg")+'" alt="" loading="lazy" onerror="avErr(this)">';return '<span class="av" style="width:'+size+'px;height:'+size+'px;font-size:'+fs+'px" aria-hidden="true">'+initials(p.name)+img+'</span>'}
   function statPill(a){var st=status(a);return '<span class="pill '+st+'">'+STAT[st]+'</span>'}
   function sortKey(a){return padStart(a.startDate)||"0000"}
   var MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -369,7 +369,7 @@ tr:last-child td{border-bottom:none}
     var past=list.filter(function(a){return status(a)==="past"}).sort(function(a,b){return sortKey(a)>sortKey(b)?-1:1});
     var tbc=list.filter(function(a){return status(a)==="tbc"});
     var h='<div class="tl">';
-    if(state.sel){var p=prof(state.sel);if(p)h+='<div class="who">'+avatar(p,72)+'<div><strong style="font-size:17px">'+esc(p.name)+'</strong><div class="note">'+esc(p.affiliation||"")+(p.field?" · "+esc(p.field):"")+'</div>'+(p.notes?'<div class="note">'+esc(p.notes)+'</div>':'')+(state.canWrite?' <button class="btn link" type="button" data-editp="'+esc(p.id)+'">Edit professor</button>':'')+(LIVE?' <button class="btn link" type="button" data-recheck="'+esc(p.id)+'">Search conferences again</button>':'')+(p.lastChecked?'<div class="note">Last searched '+esc(p.lastChecked.slice(0,16).replace("T"," "))+' UTC</div>':'')+'</div></div>'}
+    if(state.sel){var p=prof(state.sel);if(p)h+='<div class="who">'+avatar(p,72)+'<div><strong style="font-size:17px">'+esc(p.name)+'</strong><div class="note">'+esc(p.affiliation||"")+(p.field?" · "+esc(p.field):"")+'</div>'+(p.notes?'<div class="note">'+esc(p.notes)+'</div>':'')+(p.photoAuto&&p.photo!=="none"&&p.photoCredit?'<div class="note">Photo: <a href="'+esc(p.photoSource||"#")+'" target="_blank" rel="noopener">'+esc(p.photoCredit)+'</a>'+(LIVE?' <button class="btn link" type="button" data-nophoto="'+esc(p.id)+'">Wrong person? Remove photo</button>':'')+'</div>':'')+(state.canWrite?' <button class="btn link" type="button" data-editp="'+esc(p.id)+'">Edit professor</button>':'')+(LIVE?' <button class="btn link" type="button" data-recheck="'+esc(p.id)+'">Search conferences again</button>':'')+(p.lastChecked?'<div class="note">Last searched '+esc(p.lastChecked.slice(0,16).replace("T"," "))+' UTC</div>':'')+'</div></div>'}
     if(state.when!=="past"){h+='<section><h2>Upcoming ('+ups.length+')</h2>'+(ups.length?ups.map(function(a){return evRow(a,show)}).join(""):'<div class="note">No upcoming appearances logged.</div>')+'</section>'}
     if(state.when==="all"&&tbc.length){h+='<section><h2>Date not confirmed ('+tbc.length+')</h2>'+tbc.map(function(a){return evRow(a,show)}).join("")+'</section>'}
     if(state.when!=="up"){
@@ -470,6 +470,7 @@ tr:last-child td{border-bottom:none}
     if((t=e.target.closest("[data-reject]"))){review("reject",t.dataset.reject,t);return}
     if((t=e.target.closest("[data-recheck]"))){ensurePass(function(){startRecheck(t.dataset.recheck)});return}
     if((t=e.target.closest("[data-edit]"))){var eid=t.dataset.edit;LIVE?ensurePass(function(){openApp(eid)}):openApp(eid);return}
+    if((t=e.target.closest("[data-nophoto]"))){var np=prof(t.dataset.nophoto);if(np)ensurePass(async function(){try{await liveEdit([{op:"setProf",id:np.id,data:{name:np.name,photo:"none"}}]);toast("Photo removed. It will not be looked up again.")}catch(err){toast(err.message)}});return}
     if((t=e.target.closest("[data-editp]"))){var pid=t.dataset.editp;LIVE?ensurePass(function(){openProf(pid)}):openProf(pid);return}
     if((t=e.target.closest("[data-sort]"))){var k=t.dataset.sort;if(state.sortKey===k)state.sortDir=state.sortDir==="asc"?"desc":"asc";else{state.sortKey=k;state.sortDir="asc"}render()}
   });
