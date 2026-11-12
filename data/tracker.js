@@ -219,7 +219,10 @@ window.TRACKER_DATA = {
     "MIT"
    ],
    "notes": "",
-   "checkRequested": "2026-11-12T04:11:20Z"
+   "checkRequested": "2026-11-12T04:11:20Z",
+   "lastChecked": "2026-11-12T04:12:16Z",
+   "lastCheckHits": 0,
+   "lastCheckErrors": 0
   }
  ],
  "apps": [
