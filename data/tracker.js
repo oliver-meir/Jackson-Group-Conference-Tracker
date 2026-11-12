@@ -191,6 +191,20 @@ window.TRACKER_DATA = {
     "ISTA",
     "Institute of Science and Technology"
    ]
+  },
+  {
+   "id": "nobuhiko-tokuriki",
+   "name": "Nobuhiko Tokuriki",
+   "affiliation": "University of British Columbia",
+   "field": "",
+   "aliases": [],
+   "context": [
+    "University of British Columbia",
+    "British",
+    "Columbia"
+   ],
+   "notes": "",
+   "checkRequested": "2026-11-12T03:16:01Z"
   }
  ],
  "apps": [
