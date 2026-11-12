@@ -211,6 +211,15 @@ LOCATION:Boston\, USA
 DESCRIPTION:Invited talk (Confirmed). Session 2\, Engineering Protein Biologics\, 19 Jul: Direct and selective targeting of cancer-driver mutants with synthetic binding proteins Source: https://ps.memberclicks.net/daily-program-ps40
 END:VEVENT
 BEGIN:VEVENT
+UID:ps40-2026-rosemary-cater@lab-conference-tracker
+DTSTAMP:20260719T000000Z
+DTSTART;VALUE=DATE:20260719
+DTEND;VALUE=DATE:20260723
+SUMMARY:Rosemary Cater at Protein Society 40th Anniversary Symposium (PS40)
+LOCATION:Boston\, USA
+DESCRIPTION:Unknown (Unverified). Auto-found 2026-11-12: ...hapel Hill 8:35 - 9:05 a.m. Tobin Sosnick \, University of Chicago | Structural Energetics as a Framework for Rationalizing Protein Function Rosemary Cater \, University of Queensland | Structural & Molecular Basis of C Source: https://ps.memberclicks.net/daily-program-ps40
+END:VEVENT
+BEGIN:VEVENT
 UID:eps26-suga@lab-conference-tracker
 DTSTAMP:20260906T000000Z
 DTSTART;VALUE=DATE:20260906

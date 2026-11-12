@@ -279,7 +279,12 @@ window.TRACKER_DATA = {
     "Queensland"
    ],
    "notes": "",
-   "checkRequested": "2026-11-12T22:29:16Z"
+   "checkRequested": "2026-11-12T22:29:16Z",
+   "lastChecked": "2026-11-12T22:30:17Z",
+   "lastCheckHits": 1,
+   "lastCheckErrors": 0,
+   "photoChecked": "2026-11-12",
+   "photoRules": 2
   }
  ],
  "apps": [
@@ -754,6 +759,21 @@ window.TRACKER_DATA = {
    "sourceUrl": "https://synbioconference.org/2026/technical-program",
    "notes": "Auto-found 2026-11-12: ...logy, Harrison Steel , University of Oxford 11:20 AM 11:45 AM Invited Speaker: An AI-powered Self-driving Biofoundry for Synthetic Biology, Huimin Zhao , UIUC 11:45 AM 12:00 PM Selected Abstract: Emergex: A Computatio (dates read from the page, please check)",
    "series": "seed"
+  },
+  {
+   "id": "ps40-2026-rosemary-cater",
+   "profId": "rosemary-cater",
+   "watchId": "ps40-2026",
+   "conference": "Protein Society 40th Anniversary Symposium (PS40)",
+   "startDate": "2026-07-19",
+   "endDate": "2026-07-22",
+   "city": "Boston",
+   "country": "USA",
+   "role": "Unknown",
+   "confidence": "Unverified",
+   "check": "looks right",
+   "sourceUrl": "https://ps.memberclicks.net/daily-program-ps40",
+   "notes": "Auto-found 2026-11-12: ...hapel Hill 8:35 - 9:05 a.m. Tobin Sosnick , University of Chicago | Structural Energetics as a Framework for Rationalizing Protein Function Rosemary Cater , University of Queensland | Structural & Molecular Basis of C"
   }
  ],
  "rejected": [],
