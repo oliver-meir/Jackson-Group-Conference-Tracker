@@ -266,8 +266,8 @@ tr:last-child td{border-bottom:none}
   var STAT={up:"Upcoming",past:"Past",tbc:"Date TBC"};
   function initials(name){var t=String(name||"").replace(/[^A-Za-z\u00C0-\u024F .-]/g,"").split(/\s+/).filter(function(w){return w&&!/^(van|der|den|de|von|da|di|le)$/i.test(w)&&w.length>1});return ((t[0]||"?")[0]+(t.length>1?t[t.length-1][0]:"")).toUpperCase()}
   // Photos: put photos/<professor id>.jpg (or .png) in the repo. Falls back to initials.
-  window.avErr=function(img){if(/\.jpg$/.test(img.getAttribute("src"))){img.setAttribute("src",img.getAttribute("src").replace(/\.jpg$/,".png"))}else{img.remove()}};
-  function avatar(p,size){var fs=Math.round(size*0.38);var img=p.photo==="none"?"":'<img src="photos/'+esc(p.photo||p.id)+(p.photo?"":".jpg")+'" alt="" loading="lazy" onerror="avErr(this)">';return '<span class="av" style="width:'+size+'px;height:'+size+'px;font-size:'+fs+'px" aria-hidden="true">'+initials(p.name)+img+'</span>'}
+  window.avErr=function(img){if(/\.jpg$/.test(img.getAttribute("src"))&&!/^https?:/i.test(img.getAttribute("src"))){img.setAttribute("src",img.getAttribute("src").replace(/\.jpg$/,".png"))}else{img.remove()}};
+  function avatar(p,size){var fs=Math.round(size*0.38);var link=/^https:\/\//i.test(p.photo||"");var img=p.photo==="none"?"":'<img src="'+(link?esc(p.photo):'photos/'+esc(p.photo||p.id)+(p.photo?"":".jpg"))+'" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="avErr(this)">';return '<span class="av" style="width:'+size+'px;height:'+size+'px;font-size:'+fs+'px" aria-hidden="true">'+initials(p.name)+img+'</span>'}
   function statPill(a){var st=status(a);return '<span class="pill '+st+'">'+STAT[st]+'</span>'}
   function sortKey(a){return padStart(a.startDate)||"0000"}
   var MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -369,7 +369,7 @@ tr:last-child td{border-bottom:none}
     var past=list.filter(function(a){return status(a)==="past"}).sort(function(a,b){return sortKey(a)>sortKey(b)?-1:1});
     var tbc=list.filter(function(a){return status(a)==="tbc"});
     var h='<div class="tl">';
-    if(state.sel){var p=prof(state.sel);if(p)h+='<div class="who">'+avatar(p,72)+'<div><strong style="font-size:17px">'+esc(p.name)+'</strong><div class="note">'+esc(p.affiliation||"")+(p.field?" · "+esc(p.field):"")+'</div>'+(p.notes?'<div class="note">'+esc(p.notes)+'</div>':'')+(p.photoAuto&&p.photo!=="none"&&p.photoCredit?'<div class="note">Photo: <a href="'+esc(p.photoSource||"#")+'" target="_blank" rel="noopener">'+esc(p.photoCredit)+'</a>'+(LIVE?' <button class="btn link" type="button" data-nophoto="'+esc(p.id)+'">Wrong person? Remove photo</button>':'')+'</div>':'')+(state.canWrite?' <button class="btn link" type="button" data-editp="'+esc(p.id)+'">Edit professor</button>':'')+(LIVE?' <button class="btn link" type="button" data-recheck="'+esc(p.id)+'">Search conferences again</button>':'')+(p.lastChecked?'<div class="note">Last searched '+esc(p.lastChecked.slice(0,16).replace("T"," "))+' UTC</div>':'')+'</div></div>'}
+    if(state.sel){var p=prof(state.sel);if(p)h+='<div class="who">'+avatar(p,72)+'<div><strong style="font-size:17px">'+esc(p.name)+'</strong><div class="note">'+esc(p.affiliation||"")+(p.field?" · "+esc(p.field):"")+'</div>'+(p.notes?'<div class="note">'+esc(p.notes)+'</div>':'')+(p.photoAuto&&p.photo!=="none"&&!/^https?:/i.test(p.photo||"")&&p.photoCredit?'<div class="note">Photo: <a href="'+esc(p.photoSource||"#")+'" target="_blank" rel="noopener">'+esc(p.photoCredit)+'</a>'+(LIVE?' <button class="btn link" type="button" data-nophoto="'+esc(p.id)+'">Wrong person? Remove photo</button>':'')+'</div>':'')+(state.canWrite?' <button class="btn link" type="button" data-editp="'+esc(p.id)+'">Edit professor</button>':'')+(LIVE?' <button class="btn link" type="button" data-recheck="'+esc(p.id)+'">Search conferences again</button>':'')+(p.lastChecked?'<div class="note">Last searched '+esc(p.lastChecked.slice(0,16).replace("T"," "))+' UTC</div>':'')+'</div></div>'}
     if(state.when!=="past"){h+='<section><h2>Upcoming ('+ups.length+')</h2>'+(ups.length?ups.map(function(a){return evRow(a,show)}).join(""):'<div class="note">No upcoming appearances logged.</div>')+'</section>'}
     if(state.when==="all"&&tbc.length){h+='<section><h2>Date not confirmed ('+tbc.length+')</h2>'+tbc.map(function(a){return evRow(a,show)}).join("")+'</section>'}
     if(state.when!=="up"){
@@ -491,6 +491,7 @@ tr:last-child td{border-bottom:none}
       '<label for="pAff">Affiliation<input id="pAff" value="'+esc(p.affiliation||"")+'" placeholder="University, department"></label>'+
       '<label for="pField">Field<input id="pField" value="'+esc(p.field||"")+'" placeholder="e.g. protein engineering"></label>'+
       '<label class="full" for="pAlias">Other name forms (comma separated, used by the speaker list check)<input id="pAlias" value="'+esc((p.aliases||[]).join(", "))+'" placeholder="e.g. J. Smith, Jane Smith-Lee"></label>'+
+      '<label class="full" for="pPhoto">Photo link (optional: right-click a photo of them, e.g. on their university page, choose "Copy image address", paste here)<input id="pPhoto" value="'+esc(/^https?:/i.test(p.photo||"")?p.photo:"")+'" placeholder="https://..."></label>'+
       '<label class="full" for="pNotes">Notes<textarea id="pNotes" placeholder="Why this person matters, profile links">'+esc(p.notes||"")+'</textarea></label>'+
       '</form><div class="err" id="pErr"></div><div class="row">'+(id?'<button class="btn" type="button" id="pDel">Delete professor</button>':'')+'<button class="btn" type="button" id="pCancel">Cancel</button><button class="btn primary" type="button" id="pSave">Save</button></div>');
     $("pCancel").onclick=closeDlg;
@@ -505,6 +506,11 @@ tr:last-child td{border-bottom:none}
     $("pSave").onclick=async function(){
       var name=val("pName");if(!name){$("pErr").textContent="Enter a name.";return}
       var body={name:name,affiliation:val("pAff"),field:val("pField"),notes:val("pNotes"),aliases:val("pAlias").split(",").map(function(s){return s.trim()}).filter(Boolean),updatedAt:new Date().toISOString()};
+      var ph=val("pPhoto");
+      if(ph){if(!/^https:\/\/\S+$/i.test(ph)){$("pErr").textContent="The photo link must start with https:// (right-click the photo and choose Copy image address).";return}
+        if(ph.length>300){$("pErr").textContent="That photo link is too long. Open the image on its own and copy the shorter address from the address bar, or pick another photo.";return}
+        body.photo=ph}
+      else if(id&&/^https?:/i.test((prof(id)||{}).photo||""))body.photo="";
       var pid=id;if(!pid){pid=slug(name);if(prof(pid))pid=pid+"-"+Date.now().toString(36)}
       $("pSave").disabled=true;
       try{await state.db.doc("profs/"+pid).set(body);closeDlg();toast(id?"Saved":"Professor added")}catch(err){$("pSave").disabled=false;$("pErr").textContent=dbErr(err)}

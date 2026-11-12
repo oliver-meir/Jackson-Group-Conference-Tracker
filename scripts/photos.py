@@ -20,6 +20,7 @@ from pathlib import Path
 WD_API = "https://www.wikidata.org/w/api.php"
 COMMONS_API = "https://commons.wikimedia.org/w/api.php"
 RETRY_DAYS = 30  # people without a photo are looked up again after this many days
+RULES = 2  # bump when the matching improves, so everyone without a photo is retried
 
 SCIENCE = re.compile(
     r"\b(scientist|chemist|biologist|biochemist|biophysicist|physicist|engineer|bioengineer|"
@@ -30,7 +31,18 @@ STOP = {"university", "of", "the", "and", "institute", "college", "school", "at"
 
 
 def _tokens(text: str) -> set[str]:
-    return {w for w in re.findall(r"[a-z]{3,}", (text or "").lower()) if w not in STOP}
+    words = {w for w in re.findall(r"[a-z]{3,}", (text or "").lower()) if w not in STOP}
+    for part in re.split(r"[/,;()]| also ", text or ""):  # "Broad Institute / MIT" -> also "bi", "mit"
+        a = _acronym(part.strip())
+        if len(a) >= 3:
+            words.add(a)
+    return words
+
+
+def _acronym(name: str) -> str:
+    """Massachusetts Institute of Technology -> mit, University of Illinois Urbana-Champaign -> uiuc."""
+    words = [w for w in re.findall(r"[A-Za-z]+", name or "") if w.lower() not in {"of", "the", "and", "at", "for", "de"}]
+    return "".join(w[0] for w in words).lower() if len(words) >= 2 else ""
 
 
 def _claims(entity: dict, prop: str) -> list:
@@ -84,7 +96,10 @@ def find_photo(name: str, affiliation: str, get_json) -> dict | None:
         for p in ("P108", "P1416"):
             for v in _claims(e, p):
                 if isinstance(v, dict) and v.get("id") in orgs:
-                    words |= _tokens(_label(orgs[v["id"]]))
+                    org = _label(orgs[v["id"]])
+                    words |= _tokens(org)
+                    if _acronym(org):
+                        words.add(_acronym(org))
         return len(aff & words) >= 1
 
     matching = [(q, e) for q, e in people if aff_match(e)]
@@ -132,7 +147,7 @@ def fill_photos(profs: list[dict], photos_dir: Path, get_json, get_bytes, only: 
         if p.get("autoPhoto") is False or p.get("photo") == "none" or has_manual_photo(p, photos_dir) or p.get("photoAuto"):
             continue
         last = p.get("photoChecked")
-        if last and not only:
+        if last and not only and p.get("photoRules", 1) >= RULES:
             try:
                 if (today - dt.date.fromisoformat(last)).days < RETRY_DAYS:
                     continue
@@ -159,5 +174,6 @@ def fill_photos(profs: list[dict], photos_dir: Path, get_json, get_bytes, only: 
         except Exception as e:  # noqa: BLE001  (a photo is never worth failing the run for)
             log(f'photo: lookup failed for {p["name"]} ({type(e).__name__})')
         p["photoChecked"] = today.isoformat()
+        p["photoRules"] = RULES
         changed += 1
     return changed

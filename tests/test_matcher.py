@@ -318,3 +318,12 @@ def test_photos_only_for_clear_matches(tmp_path):
     assert n == 4 and len(got) == 2
     # next run within 30 days does not look again
     assert fill_photos(profs, tmp_path / "photos", _fake_wikimedia(people, orgs), lambda u: 1 / 0, log=lambda *_: None) == 0
+
+
+def test_photo_matches_university_acronyms():
+    from photos import find_photo
+    people = {"Q1": ("Feng Zhang", "Chinese-American biochemist", ["Q100"], "Zhang.jpg"),
+              "Q2": ("Feng Zhang", "Chinese physicist", ["Q200"], "Other.jpg")}
+    orgs = {"Q100": "Massachusetts Institute of Technology", "Q200": "Tsinghua University"}
+    assert find_photo("Feng Zhang", "Broad Institute / MIT / HHMI", _fake_wikimedia(people, orgs))["qid"] == "Q1"
+    assert find_photo("Feng Zhang", "UCLA", _fake_wikimedia(people, orgs)) is None
