@@ -236,7 +236,7 @@ def test_series_ignores_site_menu_and_fixes_old_rows(tmp_path, monkeypatch):
     (fx / "seed-2026.html").write_text(f"<html><body>{menu}<h1>2026 SEED</h1><p>June 15-18, 2026 | Hyatt Regency Denver, Denver, CO</p>"
                                        "<p>June 15, 2026 Day 1 KEYNOTE Hiroaki Suga, University of Tokyo, Co-founder of Peptidream "
                                        + "x " * 120 + "</p></body></html>")
-    (fx / "seed-2027.html").write_text(f"<html><body>{menu}<h1>2027 SEED</h1><p>Program coming soon for 2027 " + "x " * 120 + "</p></body></html>")
+    (fx / "seed-2027.html").write_text(f"<html><body>{menu}<h1>2027 SEED</h1><p>Last year: 2026 SEED, June 15-18, 2026, Denver. Program coming soon for 2027 " + "x " * 120 + "</p></body></html>")
     tracker = {"profs": [{"id": "hiroaki-suga", "name": "Hiroaki Suga", "aliases": [], "affiliation": "University of Tokyo",
                           "context": ["Tokyo", "peptide"]}],
                "apps": [{"id": "seed-2026-hiroaki-suga", "profId": "hiroaki-suga", "watchId": "seed-2026", "series": "seed",

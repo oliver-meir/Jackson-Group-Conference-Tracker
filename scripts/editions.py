@@ -191,11 +191,14 @@ def describe_edition(text: str, year: int | None, exclude=frozenset()):
 
 
 def site_furniture(texts: list[str]) -> set:
-    """Date ranges that appear on two or more editions' pages of the same series.
-    A conference's own dates appear on its own page; ranges repeated across years are
-    menus, banners for other events, and footers."""
+    """Date ranges that appear on every edition's page of the same series. A site menu
+    or footer is on every page; a conference's own dates can also turn up on a
+    neighbouring year's page ("last year's meeting was ..."), so appearing on two pages
+    is not enough."""
+    if len(texts) < 2:
+        return set()
     seen = {}
     for i, t in enumerate(texts):
         for s, e, _, _ in find_ranges(t):
             seen.setdefault((s, e), set()).add(i)
-    return {k for k, v in seen.items() if len(v) >= 2}
+    return {k for k, v in seen.items() if len(v) == len(texts)}
