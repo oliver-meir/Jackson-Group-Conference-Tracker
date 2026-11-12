@@ -267,6 +267,19 @@ window.TRACKER_DATA = {
    "lastCheckErrors": 0,
    "photoChecked": "2026-11-12",
    "photoRules": 2
+  },
+  {
+   "id": "rosemary-cater",
+   "name": "Rosemary Cater",
+   "affiliation": "University of Queensland",
+   "field": "",
+   "aliases": [],
+   "context": [
+    "University of Queensland",
+    "Queensland"
+   ],
+   "notes": "",
+   "checkRequested": "2026-11-12T22:29:16Z"
   }
  ],
  "apps": [
