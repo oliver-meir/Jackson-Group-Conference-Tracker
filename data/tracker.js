@@ -191,23 +191,6 @@ window.TRACKER_DATA = {
     "ISTA",
     "Institute of Science and Technology"
    ]
-  },
-  {
-   "id": "adam-perriman",
-   "name": "Adam Perriman",
-   "affiliation": "Australian National University",
-   "field": "",
-   "aliases": [],
-   "context": [
-    "Australian National University",
-    "Australian",
-    "National"
-   ],
-   "notes": "",
-   "checkRequested": "2026-11-12T03:11:39Z",
-   "lastChecked": "2026-11-12T03:12:28Z",
-   "lastCheckHits": 0,
-   "lastCheckErrors": 0
   }
  ],
  "apps": [
@@ -641,6 +624,7 @@ window.TRACKER_DATA = {
    "notes": ""
   }
  ],
+ "rejected": [],
  "geo": {
   "Bordeaux|France": [
    44.8378,
