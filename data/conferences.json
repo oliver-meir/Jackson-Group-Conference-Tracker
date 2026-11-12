@@ -1,1 +1,49 @@
-[]
+[
+  {
+    "id": "seed",
+    "name": "SEED",
+    "urls": [
+      "https://synbioconference.org/{year}/technical-program"
+    ],
+    "city": "",
+    "country": "",
+    "enabled": true,
+    "added": "2026-11-12",
+    "checkRequested": "2026-11-12T04:21:53Z",
+    "editions": {
+      "2025": {
+        "status": "found",
+        "start": "2025-06-23",
+        "end": "2025-06-26",
+        "city": "Houston",
+        "country": "USA",
+        "urls": [
+          "https://synbioconference.org/2025/technical-program"
+        ]
+      },
+      "2026": {
+        "status": "found",
+        "start": "2026-11-08",
+        "end": "2026-11-12",
+        "city": "Minneapolis",
+        "country": "USA",
+        "urls": [
+          "https://synbioconference.org/2026/technical-program"
+        ]
+      },
+      "2027": {
+        "status": "found",
+        "start": "2027-03-21",
+        "end": "2027-03-25",
+        "city": "Minneapolis",
+        "country": "USA",
+        "urls": [
+          "https://synbioconference.org/2027/technical-program"
+        ]
+      }
+    },
+    "lastChecked": "2026-11-12T04:22:21Z",
+    "lastCheckHits": 0,
+    "lastCheckErrors": []
+  }
+]
