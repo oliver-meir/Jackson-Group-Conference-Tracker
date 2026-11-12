@@ -207,21 +207,6 @@
       "lastChecked": "2026-11-12T03:16:49Z",
       "lastCheckHits": 1,
       "lastCheckErrors": 0
-    },
-    {
-      "id": "domitilla-del-vecchio",
-      "name": "Domitilla Del Vecchio",
-      "affiliation": "MIT",
-      "field": "",
-      "aliases": [],
-      "context": [
-        "MIT"
-      ],
-      "notes": "",
-      "checkRequested": "2026-11-12T04:11:20Z",
-      "lastChecked": "2026-11-12T04:12:16Z",
-      "lastCheckHits": 0,
-      "lastCheckErrors": 0
     }
   ],
   "apps": [
