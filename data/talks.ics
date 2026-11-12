@@ -175,6 +175,15 @@ LOCATION:Denver\, USA
 DESCRIPTION:Keynote (Confirmed). Auto-found 2026-11-12: ...Peyton Greenside\, BigHat Biosciences 9:15 AM 10:00 AM KEYNOTE: LassoGrafting of pseudo-cyclic peptide motifs to proteins for NeoBiologics\, Hiroaki Suga\, University of Tokyo\, Co-founder of Peptidream 10:00 AM 10:30 AM  Source: https://synbioconference.org/2026/technical-program
 END:VEVENT
 BEGIN:VEVENT
+UID:seed-2026-huimin-zhao@lab-conference-tracker
+DTSTAMP:20260615T000000Z
+DTSTART;VALUE=DATE:20260615
+DTEND;VALUE=DATE:20260619
+SUMMARY:Huimin Zhao at SEED 2026
+LOCATION:Denver\, USA
+DESCRIPTION:Invited talk (Unverified). Auto-found 2026-11-12: ...logy\, Harrison Steel \, University of Oxford 11:20 AM 11:45 AM Invited Speaker: An AI-powered Self-driving Biofoundry for Synthetic Biology\, Huimin Zhao \, UIUC 11:45 AM 12:00 PM Selected Abstract: Emergex: A Computatio (dates read from the page\, please check) Source: https://synbioconference.org/2026/technical-program
+END:VEVENT
+BEGIN:VEVENT
 UID:icml26-bronstein@lab-conference-tracker
 DTSTAMP:20260706T000000Z
 DTSTART;VALUE=DATE:20260706
