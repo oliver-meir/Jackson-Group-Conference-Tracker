@@ -86,6 +86,7 @@ def test_end_to_end_with_fixture(tmp_path, monkeypatch):
     monkeypatch.setattr(cw, "STATUS", repo / "data" / "check_status.json")
     monkeypatch.setattr(cw, "REPORT", repo / "report.md")
     monkeypatch.setattr(cw, "WATCHLIST", repo / "watchlist.yaml")
+    monkeypatch.setattr(cw, "SERIES", repo / "data" / "conferences.json")
     monkeypatch.setattr(bo, "DATA", repo / "data")
 
     assert cw.main(["--from-dir", str(ROOT / "tests" / "fixtures")]) == 0
@@ -125,7 +126,8 @@ def _repo(tmp_path, monkeypatch, tracker=None):
         "prof_pages: []\n")
     for name, val in {"ROOT": repo, "DATA": repo / "data", "TRACKER": repo / "data" / "tracker.json",
                       "HASHES": repo / "data" / "page_hashes.json", "STATUS": repo / "data" / "check_status.json",
-                      "REPORT": repo / "report.md", "WATCHLIST": repo / "watchlist.yaml"}.items():
+                      "REPORT": repo / "report.md", "WATCHLIST": repo / "watchlist.yaml",
+                      "SERIES": repo / "data" / "conferences.json"}.items():
         monkeypatch.setattr(cw, name, val)
     monkeypatch.setattr(bo, "DATA", repo / "data")
     return cw, repo
@@ -222,11 +224,33 @@ def test_dates_ignore_site_menu_events():
     assert info["city"] == "Denver"
 
 
-def test_html_to_text_drops_menus():
-    from check_watchlist import html_to_text
-    html = ('<html><body><header><div class="main-menu"><a>Annual Meeting November 8-12, 2026 Minneapolis</a></div>'
-            '<h1>SEED June 15-18, 2026 Denver</h1></header><nav>Other event May 1-3, 2026</nav>'
-            '<main><p>Keynote Hiroaki Suga</p></main><footer>Footer stuff</footer></body></html>')
-    t = html_to_text(html)
-    assert "Minneapolis" not in t and "May 1-3" not in t and "Footer" not in t
-    assert "June 15-18, 2026 Denver" in t and "Hiroaki Suga" in t
+def test_series_ignores_site_menu_and_fixes_old_rows(tmp_path, monkeypatch):
+    """SEED 2026 bug: AIChE's Events menu (other meetings, other cities) is on every page.
+    Ranges repeated across editions are site furniture; the real banner wins. An old
+    unconfirmed row with wrong dates/place is corrected on the next check."""
+    menu = ('<nav><ul class="menu"><li>2026 AIChE Annual Meeting November 8-12, 2026 Minneapolis Convention '
+            'Center, Minneapolis, MN</li><li>2027 Spring Meeting March 21-25, 2027 Oklahoma City</li></ul></nav>')
+    fx = tmp_path / "fx"; fx.mkdir()
+    (fx / "seed-2025.html").write_text(f"<html><body>{menu}<h1>2025 SEED</h1><p>June 23-26, 2025 | Houston, TX</p>"
+                                       "<p>June 23, 2025 Day 1 opening remarks and a long program follows " + "x " * 120 + "</p></body></html>")
+    (fx / "seed-2026.html").write_text(f"<html><body>{menu}<h1>2026 SEED</h1><p>June 15-18, 2026 | Hyatt Regency Denver, Denver, CO</p>"
+                                       "<p>June 15, 2026 Day 1 KEYNOTE Hiroaki Suga, University of Tokyo, Co-founder of Peptidream "
+                                       + "x " * 120 + "</p></body></html>")
+    (fx / "seed-2027.html").write_text(f"<html><body>{menu}<h1>2027 SEED</h1><p>Program coming soon for 2027 " + "x " * 120 + "</p></body></html>")
+    tracker = {"profs": [{"id": "hiroaki-suga", "name": "Hiroaki Suga", "aliases": [], "affiliation": "University of Tokyo",
+                          "context": ["Tokyo", "peptide"]}],
+               "apps": [{"id": "seed-2026-hiroaki-suga", "profId": "hiroaki-suga", "watchId": "seed-2026", "series": "seed",
+                         "conference": "SEED 2026", "startDate": "", "endDate": "", "city": "Tokyo", "country": "Japan",
+                         "confidence": "Unverified"}]}
+    cw, repo = _repo(tmp_path, monkeypatch, tracker)
+    monkeypatch.setattr(cw, "SERIES", repo / "data" / "conferences.json")
+    monkeypatch.setenv("TRACKER_TODAY", "2026-11-12")
+    (repo / "data" / "conferences.json").write_text(json.dumps([
+        {"id": "seed", "name": "SEED", "urls": ["https://synbioconference.org/{year}/technical-program"], "enabled": True}]))
+    assert cw.main(["--from-dir", str(fx), "--conference", "seed", "--no-geocode"]) == 0
+    eds = json.loads((repo / "data" / "conferences.json").read_text())[0]["editions"]
+    assert (eds["2026"]["start"], eds["2026"]["end"], eds["2026"]["city"]) == ("2026-06-15", "2026-06-18", "Denver")
+    assert (eds["2025"]["start"], eds["2025"]["city"]) == ("2025-06-23", "Houston")
+    assert "start" not in eds["2027"] and "city" not in eds["2027"]  # menu dates/cities never leak in
+    row = next(a for a in json.loads((repo / "data" / "tracker.json").read_text())["apps"] if a["id"] == "seed-2026-hiroaki-suga")
+    assert (row["startDate"], row["endDate"], row["city"], row["country"]) == ("2026-06-15", "2026-06-18", "Denver", "USA")

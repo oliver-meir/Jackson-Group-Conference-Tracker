@@ -26,7 +26,7 @@ from bs4 import BeautifulSoup
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from matcher import find_all, normalise  # noqa: E402
-from editions import describe_edition, expand_series  # noqa: E402
+from editions import describe_edition, expand_series, site_furniture  # noqa: E402
 import build_outputs  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -52,19 +52,8 @@ def save_json(path: Path, obj) -> None:
 
 def html_to_text(html: str) -> str:
     soup = BeautifulSoup(html, "html.parser")
-    for tag in soup(["script", "style", "noscript", "svg", "nav"]):
+    for tag in soup(["script", "style", "noscript", "svg"]):
         tag.decompose()
-    # site menus and footers list other events with their own dates and cities
-    menuish = re.compile(r"(^|[-_])(nav|navbar|navigation|menu|megamenu|dropdown|footer|breadcrumbs?)([-_]|$)", re.I)
-    for tag in soup.find_all(True):
-        if getattr(tag, "decomposed", False):
-            continue
-        if tag.name in ("body", "main", "html") or tag.attrs is None:
-            continue
-        role = (tag.get("role") or "").lower()
-        names = list(tag.get("class") or []) + [tag.get("id") or ""]
-        if role in ("navigation", "menu", "menubar", "contentinfo") or tag.name == "footer" or any(menuish.search(n) for n in names if n):
-            tag.decompose()
     return soup.get_text(" ", strip=True)
 
 
@@ -109,6 +98,21 @@ def already_logged(apps: list[dict], prof_id: str, watch: dict) -> bool:
     return False
 
 
+def refresh_row(apps, prof_id, watch, start, end_, city, country):
+    """An auto-found row nobody has confirmed or edited yet follows the latest reading of
+    the edition's dates and place, so a fix to the date reader also fixes old rows."""
+    for a in apps:
+        if a.get("profId") != prof_id or a.get("watchId") != watch["id"]:
+            continue
+        if a.get("confidence") != "Unverified" or a.get("edited") or not a.get("series"):
+            return
+        new = dict(startDate=start, endDate=end_, city=city, country=country)
+        if any(a.get(k, "") != v for k, v in new.items()):
+            a.update(new)
+            return True
+        return False
+
+
 def _not_published(exc) -> bool:
     """For next/last year's edition, a missing page just means it is not online (yet)."""
     if isinstance(exc, FileNotFoundError):
@@ -139,12 +143,44 @@ def check_conferences(entries, tracker, getter, report, errors, only=None, editi
     profs = [p for p in tracker["profs"] if not p.get("paused") and (only is None or p["id"] == only)]
     rejected = set(tracker.get("rejected") or [])
     new_rows = []
+    # read every page once, then work out which date ranges are site furniture per series
+    cache = {}
+
+    def fetch(url, key):
+        if url not in cache:
+            try:
+                cache[url] = (True, getter(url, key))
+            except Exception as e:  # noqa: BLE001
+                cache[url] = (False, e)
+        ok, val = cache[url]
+        if not ok:
+            raise val
+        return val
+
+    furniture = {}
+    by_series = {}
+    for watch in entries:
+        if watch.get("series"):
+            by_series.setdefault(watch["series"], []).append(watch)
+    for sid, ws in by_series.items():
+        pages = []
+        for watch in ws:
+            parts = []
+            for idx, url in enumerate(watch.get("urls") or []):
+                try:
+                    parts.append(fetch(url, f'{watch["id"]}' + (f"-{idx}" if idx else "")))
+                except Exception:  # noqa: BLE001
+                    pass
+            if parts:
+                pages.append(" ".join(parts))
+        furniture[sid] = site_furniture(pages) if len(pages) >= 2 else set()
+
     for watch in entries:
         urls = watch.get("urls") or []
         texts, problems, missing = [], [], 0
         for idx, url in enumerate(urls):
             try:
-                texts.append((url, getter(url, f'{watch["id"]}' + (f"-{idx}" if idx else ""))))
+                texts.append((url, fetch(url, f'{watch["id"]}' + (f"-{idx}" if idx else ""))))
             except Exception as e:  # noqa: BLE001
                 if watch.get("optional") and _not_published(e):
                     missing += 1
@@ -161,7 +197,8 @@ def check_conferences(entries, tracker, getter, report, errors, only=None, editi
         status = "found" if good else ("not published yet" if missing and not problems else "could not read")
         info = {}
         if good and watch.get("series"):
-            info = describe_edition(" ".join(t for _, t in good), watch.get("year"))
+            info = describe_edition(" ".join(t for _, t in good), watch.get("year"),
+                                    furniture.get(watch["series"], set()))
         start = str(watch.get("start") or info.get("start") or "")
         end_ = str(watch.get("end") or info.get("end") or "")
         city = watch.get("city") or info.get("city", "")
@@ -176,6 +213,8 @@ def check_conferences(entries, tracker, getter, report, errors, only=None, editi
                 if m.prof_id in (watch.get("ignore") or []) or f'{watch["id"]}:{m.prof_id}' in rejected:
                     continue
                 if already_logged(tracker["apps"] + new_rows, m.prof_id, watch):
+                    if refresh_row(tracker["apps"], m.prof_id, watch, start, end_, city, country):
+                        report["refreshed"] = report.get("refreshed", 0) + 1
                     continue
                 row = {
                     "id": f'{watch["id"]}-{m.prof_id}',
@@ -302,7 +341,7 @@ def main(argv=None) -> int:
                 p["lastChecked"] = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
                 p["lastCheckHits"] = len(new_rows)
                 p["lastCheckErrors"] = len(errors)
-    if new_rows or args.only:
+    if new_rows or args.only or report.get("refreshed"):
         save_json(TRACKER, tracker)
     if not args.only and editions:
         now = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")

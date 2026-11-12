@@ -115,14 +115,10 @@ def _support(t: str, s: dt.date, e: dt.date, span: tuple[int, int]) -> int:
     return n
 
 
-def find_dates(text: str, year: int | None = None):
-    """The page's main multi-day date range (in the given year, if any).
-    Returns (start, end, position) or None. Single dates are ignored as candidates: on
-    conference sites they are usually deadlines. When several ranges appear (site menus
-    often list other events), the one the rest of the page backs up most wins; ties go to
-    the earliest."""
+def find_ranges(text: str, year: int | None = None):
+    """Every plausible multi-day date range on the page: [(start, end, pos, endpos)]."""
     t = _clean(text)
-    cands = []
+    out = []
     for kind, pat in RANGE_PATTERNS:
         for m in pat.finditer(t):
             g = m.groups()
@@ -138,10 +134,22 @@ def find_dates(text: str, year: int | None = None):
                 continue
             if year and s.year != year:
                 continue
-            cands.append((s, e, m.start(), m.end()))
+            out.append((s, e, m.start(), m.end()))
+    return out
+
+
+def find_dates(text: str, year: int | None = None, exclude=frozenset()):
+    """The page's main multi-day date range (in the given year, if any).
+    Returns (start, end, position) or None. Single dates are ignored as candidates: on
+    conference sites they are usually deadlines. `exclude` holds (start, end) pairs that
+    are site furniture (the same range shows up on other editions' pages, e.g. an events
+    menu), so they never win. Of the rest, the one the page backs up most wins (a program
+    repeats its own days); ties go to the earliest."""
+    t = _clean(text)
+    cands = [c for c in find_ranges(t, year) if (c[0], c[1]) not in exclude]
     if not cands:
         return None
-    # each distinct range counts once per extra appearance as a range, plus day mentions
+
     def score(c):
         same = sum(1 for o in cands if (o[0], o[1]) == (c[0], c[1]) and o[2] != c[2])
         return same + _support(t, c[0], c[1], (c[2], c[3]))
@@ -168,16 +176,26 @@ def find_place(text: str, near: int | None = None, window: int = 300):
     return (best[0], best[1]) if best else None
 
 
-def describe_edition(text: str, year: int | None):
-    """Dates and place read off an edition's page."""
-    found = find_dates(text, year)
+def describe_edition(text: str, year: int | None, exclude=frozenset()):
+    """Dates and place read off an edition's page. The place is only taken from next to
+    the dates: a city elsewhere on a program page is usually a speaker's affiliation."""
+    found = find_dates(text, year, exclude)
     info = {}
     if found:
         s, e, pos = found
         info.update(start=s.isoformat(), end=e.isoformat())
-        place = find_place(text, near=pos)
-    else:
-        place = find_place(text)
-    if place:
-        info.update(city=place[0], country=place[1])
+        place = find_place(text, near=pos, window=150)
+        if place:
+            info.update(city=place[0], country=place[1])
     return info
+
+
+def site_furniture(texts: list[str]) -> set:
+    """Date ranges that appear on two or more editions' pages of the same series.
+    A conference's own dates appear on its own page; ranges repeated across years are
+    menus, banners for other events, and footers."""
+    seen = {}
+    for i, t in enumerate(texts):
+        for s, e, _, _ in find_ranges(t):
+            seen.setdefault((s, e), set()).add(i)
+    return {k for k, v in seen.items() if len(v) >= 2}
