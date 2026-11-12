@@ -208,3 +208,25 @@ def test_chair_label_of_neighbour_is_not_used():
             "Banu Ozkan, Arizona State University, USA Nobuhiko Tokuriki, Michael Smith Laboratories, University of British Columbia")
     m = find_professor(text, p)
     assert m and m.role != "Session chair"
+
+
+def test_dates_ignore_site_menu_events():
+    """AIChE pages list other events in their menu before the real banner (SEED 2026 bug)."""
+    from editions import describe_edition
+    page = ("Events 2026 AIChE Annual Meeting November 8-12, 2026 Minneapolis Convention Center, "
+            "Minneapolis, MN 2027 Spring Meeting March 21-25, 2027 Oklahoma City "
+            "2026 SEED Technical Program June 15-18, 2026 | Hyatt Regency Denver at Colorado "
+            "Convention Center, Denver, CO June 15, 2026 Day 1 Keynote Hiroaki Suga June 16, 2026 Day 2")
+    info = describe_edition(page, 2026)
+    assert info["start"] == "2026-06-15" and info["end"] == "2026-06-18"
+    assert info["city"] == "Denver"
+
+
+def test_html_to_text_drops_menus():
+    from check_watchlist import html_to_text
+    html = ('<html><body><header><div class="main-menu"><a>Annual Meeting November 8-12, 2026 Minneapolis</a></div>'
+            '<h1>SEED June 15-18, 2026 Denver</h1></header><nav>Other event May 1-3, 2026</nav>'
+            '<main><p>Keynote Hiroaki Suga</p></main><footer>Footer stuff</footer></body></html>')
+    t = html_to_text(html)
+    assert "Minneapolis" not in t and "May 1-3" not in t and "Footer" not in t
+    assert "June 15-18, 2026 Denver" in t and "Hiroaki Suga" in t

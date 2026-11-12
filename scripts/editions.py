@@ -89,12 +89,40 @@ def _mk(y, m, d):
         return None
 
 
+SINGLE_PATTERNS = [
+    re.compile(MON + r"\s+" + D + r"(?!\d)", re.I),           # June 15 / June 15, 2026
+    re.compile(D + r"(?:\s+of)?\s+" + MON + r"(?![a-z])", re.I),  # 15 June / 15th of June
+]
+
+
+def _support(t: str, s: dt.date, e: dt.date, span: tuple[int, int]) -> int:
+    """How many other day-mentions on the page fall inside the range. A real
+    conference's program repeats its own days (\"June 15, 2026\" headings); a date in a
+    site menu or a promo for another event usually appears once."""
+    days = set()
+    d = s
+    while d <= e:
+        days.add((d.month, d.day)); d += dt.timedelta(days=1)
+    n = 0
+    for pat in SINGLE_PATTERNS:
+        for m in pat.finditer(t):
+            if span[0] <= m.start() < span[1]:
+                continue
+            g = m.groups()
+            mon, day = (g[0], g[1]) if pat is SINGLE_PATTERNS[0] else (g[1], g[0])
+            if (MONTHS[mon.lower().rstrip('.')[:3]], int(day)) in days:
+                n += 1
+    return n
+
+
 def find_dates(text: str, year: int | None = None):
-    """First multi-day date range on the page (in the given year, if any).
-    Returns (start, end, position) or None. Single dates are ignored: on conference
-    sites they are usually deadlines."""
+    """The page's main multi-day date range (in the given year, if any).
+    Returns (start, end, position) or None. Single dates are ignored as candidates: on
+    conference sites they are usually deadlines. When several ranges appear (site menus
+    often list other events), the one the rest of the page backs up most wins; ties go to
+    the earliest."""
     t = _clean(text)
-    best = None
+    cands = []
     for kind, pat in RANGE_PATTERNS:
         for m in pat.finditer(t):
             g = m.groups()
@@ -110,9 +138,15 @@ def find_dates(text: str, year: int | None = None):
                 continue
             if year and s.year != year:
                 continue
-            if best is None or m.start() < best[2]:
-                best = (s, e, m.start())
-    return best
+            cands.append((s, e, m.start(), m.end()))
+    if not cands:
+        return None
+    # each distinct range counts once per extra appearance as a range, plus day mentions
+    def score(c):
+        same = sum(1 for o in cands if (o[0], o[1]) == (c[0], c[1]) and o[2] != c[2])
+        return same + _support(t, c[0], c[1], (c[2], c[3]))
+    best = max(cands, key=lambda c: (score(c), -c[2]))
+    return best[0], best[1], best[2]
 
 
 def find_place(text: str, near: int | None = None, window: int = 300):

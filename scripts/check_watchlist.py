@@ -52,8 +52,19 @@ def save_json(path: Path, obj) -> None:
 
 def html_to_text(html: str) -> str:
     soup = BeautifulSoup(html, "html.parser")
-    for tag in soup(["script", "style", "noscript", "svg"]):
+    for tag in soup(["script", "style", "noscript", "svg", "nav"]):
         tag.decompose()
+    # site menus and footers list other events with their own dates and cities
+    menuish = re.compile(r"(^|[-_])(nav|navbar|navigation|menu|megamenu|dropdown|footer|breadcrumbs?)([-_]|$)", re.I)
+    for tag in soup.find_all(True):
+        if getattr(tag, "decomposed", False):
+            continue
+        if tag.name in ("body", "main", "html") or tag.attrs is None:
+            continue
+        role = (tag.get("role") or "").lower()
+        names = list(tag.get("class") or []) + [tag.get("id") or ""]
+        if role in ("navigation", "menu", "menubar", "contentinfo") or tag.name == "footer" or any(menuish.search(n) for n in names if n):
+            tag.decompose()
     return soup.get_text(" ", strip=True)
 
 
