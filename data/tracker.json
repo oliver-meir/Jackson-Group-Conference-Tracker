@@ -662,8 +662,7 @@
       "city": "Denver",
       "country": "USA",
       "role": "Keynote",
-      "confidence": "Unverified",
-      "check": "looks right",
+      "confidence": "Confirmed",
       "sourceUrl": "https://synbioconference.org/2026/technical-program",
       "notes": "Auto-found 2026-11-12: ...Peyton Greenside, BigHat Biosciences 9:15 AM 10:00 AM KEYNOTE: LassoGrafting of pseudo-cyclic peptide motifs to proteins for NeoBiologics, Hiroaki Suga, University of Tokyo, Co-founder of Peptidream 10:00 AM 10:30 AM ",
       "series": "seed"
