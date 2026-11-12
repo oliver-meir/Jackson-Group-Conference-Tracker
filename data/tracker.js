@@ -770,8 +770,7 @@ window.TRACKER_DATA = {
    "city": "Boston",
    "country": "USA",
    "role": "Unknown",
-   "confidence": "Unverified",
-   "check": "looks right",
+   "confidence": "Confirmed",
    "sourceUrl": "https://ps.memberclicks.net/daily-program-ps40",
    "notes": "Auto-found 2026-11-12: ...hapel Hill 8:35 - 9:05 a.m. Tobin Sosnick , University of Chicago | Structural Energetics as a Framework for Rationalizing Protein Function Rosemary Cater , University of Queensland | Structural & Molecular Basis of C"
   }
