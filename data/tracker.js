@@ -20,7 +20,7 @@ window.TRACKER_DATA = {
    ],
    "photoChecked": "2026-11-12",
    "photoRules": 2,
-   "photo": "https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.researchgate.net%2Fprofile%2FColin-Jackson-9&ved=0CBcQjRxqFwoTCIiApPXZgZgDFQAAAAAdAAAAABA3&opi=89978449"
+   "photo": "https://i1.rgstatic.net/ii/profile.image/282946788446209-1444471179943_Q512/Colin-Jackson-9.jpg"
   },
   {
    "id": "david-liu",
