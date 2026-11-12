@@ -208,6 +208,20 @@ window.TRACKER_DATA = {
    "lastChecked": "2026-11-12T03:16:49Z",
    "lastCheckHits": 1,
    "lastCheckErrors": 0
+  },
+  {
+   "id": "huimin-zhao",
+   "name": "Huimin Zhao",
+   "affiliation": "University of Illinois Urbana-Champaign",
+   "field": "",
+   "aliases": [],
+   "context": [
+    "University of Illinois Urbana-Champaign",
+    "Illinois",
+    "Urbana-Champaign"
+   ],
+   "notes": "",
+   "checkRequested": "2026-11-12T04:59:07Z"
   }
  ],
  "apps": [
