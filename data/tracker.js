@@ -652,25 +652,11 @@ window.TRACKER_DATA = {
    "confidence": "Confirmed",
    "sourceUrl": "https://www.biophysics.org/2027meeting/program/scientific-sessions/symposia",
    "notes": "Auto-found 2026-11-12: ...- 12:45 PM Protein Ancestry and Adaptation Randy Stockbridge, University of Michigan, USA, Chair Banu Ozkan, Arizona State University, USA Nobuhiko Tokuriki, Michael Smith Laboratories, University of British Columbia,"
-  },
-  {
-   "id": "seed-2026-hiroaki-suga",
-   "profId": "hiroaki-suga",
-   "watchId": "seed-2026",
-   "conference": "SEED 2026",
-   "startDate": "2026-11-08",
-   "endDate": "2026-11-12",
-   "city": "Minneapolis",
-   "country": "USA",
-   "role": "Keynote",
-   "confidence": "Unverified",
-   "check": "looks right",
-   "sourceUrl": "https://synbioconference.org/2026/technical-program",
-   "notes": "Auto-found 2026-11-12: ...Peyton Greenside, BigHat Biosciences 9:15 AM 10:00 AM KEYNOTE: LassoGrafting of pseudo-cyclic peptide motifs to proteins for NeoBiologics, Hiroaki Suga, University of Tokyo, Co-founder of Peptidream 10:00 AM 10:30 AM  (dates read from the page, please check)",
-   "series": "seed"
   }
  ],
- "rejected": [],
+ "rejected": [
+  "seed-2026:hiroaki-suga"
+ ],
  "geo": {
   "Bordeaux|France": [
    44.8378,
