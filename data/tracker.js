@@ -654,9 +654,7 @@ window.TRACKER_DATA = {
    "notes": "Auto-found 2026-11-12: ...- 12:45 PM Protein Ancestry and Adaptation Randy Stockbridge, University of Michigan, USA, Chair Banu Ozkan, Arizona State University, USA Nobuhiko Tokuriki, Michael Smith Laboratories, University of British Columbia,"
   }
  ],
- "rejected": [
-  "seed-2026:hiroaki-suga"
- ],
+ "rejected": [],
  "geo": {
   "Bordeaux|France": [
    44.8378,
@@ -904,7 +902,7 @@ window.TRACKER_DATA = {
    "country": "",
    "enabled": true,
    "added": "2026-11-12",
-   "checkRequested": "2026-11-12T04:21:53Z",
+   "checkRequested": "2026-11-12T04:37:19Z",
    "editions": {
     "2025": {
      "status": "found",
