@@ -207,18 +207,6 @@
       "lastChecked": "2026-11-12T03:16:49Z",
       "lastCheckHits": 1,
       "lastCheckErrors": 0
-    },
-    {
-      "id": "bill",
-      "name": "bill",
-      "affiliation": "bob",
-      "field": "",
-      "aliases": [],
-      "context": [
-        "bob"
-      ],
-      "notes": "",
-      "checkRequested": "2026-11-12T04:55:56Z"
     }
   ],
   "apps": [
