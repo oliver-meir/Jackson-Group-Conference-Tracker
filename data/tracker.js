@@ -81,7 +81,8 @@ window.TRACKER_DATA = {
     "Massachusetts Institute"
    ],
    "photoChecked": "2026-11-12",
-   "photoRules": 2
+   "photoRules": 2,
+   "photo": "https://www.vibconferences.be/sites/default/files/styles/speaker_detail/public/2021-08/300%20x%20300%20sergey%20o.jpg?h=6c83441f&itok=32lFSi-B"
   },
   {
    "id": "shohei-koide",
