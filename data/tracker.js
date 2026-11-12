@@ -893,5 +893,18 @@ window.TRACKER_DATA = {
    "enabled": true
   }
  ],
- "conferences": []
+ "conferences": [
+  {
+   "id": "seed",
+   "name": "SEED",
+   "urls": [
+    "https://synbioconference.org/{year}/technical-program"
+   ],
+   "city": "",
+   "country": "",
+   "enabled": true,
+   "added": "2026-11-12",
+   "checkRequested": "2026-11-12T04:21:53Z"
+  }
+ ]
 };
