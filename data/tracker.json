@@ -203,7 +203,10 @@
         "Columbia"
       ],
       "notes": "",
-      "checkRequested": "2026-11-12T03:16:01Z"
+      "checkRequested": "2026-11-12T03:16:01Z",
+      "lastChecked": "2026-11-12T03:16:49Z",
+      "lastCheckHits": 1,
+      "lastCheckErrors": 0
     }
   ],
   "apps": [
@@ -635,6 +638,21 @@
       "confidence": "Confirmed",
       "sourceUrl": "https://vibconferences.be/speaker/sergey-ovchinnikov",
       "notes": ""
+    },
+    {
+      "id": "bps-2027-nobuhiko-tokuriki",
+      "profId": "nobuhiko-tokuriki",
+      "watchId": "bps-2027",
+      "conference": "Biophysical Society 71st Annual Meeting",
+      "startDate": "2027-02-20",
+      "endDate": "2027-02-24",
+      "city": "Philadelphia",
+      "country": "USA",
+      "role": "Session chair",
+      "confidence": "Unverified",
+      "check": "looks right",
+      "sourceUrl": "https://www.biophysics.org/2027meeting/program/scientific-sessions/symposia",
+      "notes": "Auto-found 2026-11-12: ...- 12:45 PM Protein Ancestry and Adaptation Randy Stockbridge, University of Michigan, USA, Chair Banu Ozkan, Arizona State University, USA Nobuhiko Tokuriki, Michael Smith Laboratories, University of British Columbia,"
     }
   ],
   "rejected": []
