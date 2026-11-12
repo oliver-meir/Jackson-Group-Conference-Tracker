@@ -642,15 +642,13 @@
     {
       "id": "bps-2027-nobuhiko-tokuriki",
       "profId": "nobuhiko-tokuriki",
-      "watchId": "bps-2027",
       "conference": "Biophysical Society 71st Annual Meeting",
       "startDate": "2027-02-20",
       "endDate": "2027-02-24",
       "city": "Philadelphia",
       "country": "USA",
-      "role": "Session chair",
+      "role": "Invited talk",
       "confidence": "Unverified",
-      "check": "looks right",
       "sourceUrl": "https://www.biophysics.org/2027meeting/program/scientific-sessions/symposia",
       "notes": "Auto-found 2026-11-12: ...- 12:45 PM Protein Ancestry and Adaptation Randy Stockbridge, University of Michigan, USA, Chair Banu Ozkan, Arizona State University, USA Nobuhiko Tokuriki, Michael Smith Laboratories, University of British Columbia,"
     }
