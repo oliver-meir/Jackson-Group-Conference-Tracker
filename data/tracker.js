@@ -695,8 +695,7 @@ window.TRACKER_DATA = {
    "city": "Denver",
    "country": "USA",
    "role": "Invited talk",
-   "confidence": "Unverified",
-   "check": "check carefully: name form \"huimin zhao\"; no affiliation words nearby",
+   "confidence": "Confirmed",
    "sourceUrl": "https://synbioconference.org/2026/technical-program",
    "notes": "Auto-found 2026-11-12: ...logy, Harrison Steel , University of Oxford 11:20 AM 11:45 AM Invited Speaker: An AI-powered Self-driving Biofoundry for Synthetic Biology, Huimin Zhao , UIUC 11:45 AM 12:00 PM Selected Abstract: Emergex: A Computatio (dates read from the page, please check)",
    "series": "seed"
