@@ -660,8 +660,8 @@ window.TRACKER_DATA = {
    "conference": "SEED 2026",
    "startDate": "",
    "endDate": "",
-   "city": "Tokyo",
-   "country": "Japan",
+   "city": "",
+   "country": "",
    "role": "Keynote",
    "confidence": "Unverified",
    "check": "looks right",
@@ -921,24 +921,21 @@ window.TRACKER_DATA = {
    "checkRequested": "2026-11-12T04:44:48Z",
    "editions": {
     "2025": {
-     "status": "could not read",
+     "status": "found",
      "urls": [
       "https://synbioconference.org/2025/technical-program"
-     ],
-     "problems": [
-      "seed-2025: https://synbioconference.org/2025/technical-program returned almost no text (page may need a browser or has moved)"
      ]
     },
     "2026": {
      "status": "found",
-     "city": "Tokyo",
-     "country": "Japan",
      "urls": [
       "https://synbioconference.org/2026/technical-program"
      ]
     },
     "2027": {
      "status": "found",
+     "start": "2027-06-07",
+     "end": "2027-06-10",
      "city": "New Orleans",
      "country": "USA",
      "urls": [
@@ -946,11 +943,9 @@ window.TRACKER_DATA = {
      ]
     }
    },
-   "lastChecked": "2026-11-12T04:37:49Z",
-   "lastCheckHits": 1,
-   "lastCheckErrors": [
-    "seed-2025: https://synbioconference.org/2025/technical-program returned almost no text (page may need a browser or has moved)"
-   ]
+   "lastChecked": "2026-11-12T04:45:18Z",
+   "lastCheckHits": 0,
+   "lastCheckErrors": []
   }
  ]
 };
