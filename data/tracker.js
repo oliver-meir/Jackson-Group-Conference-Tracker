@@ -658,10 +658,10 @@ window.TRACKER_DATA = {
    "profId": "hiroaki-suga",
    "watchId": "seed-2026",
    "conference": "SEED 2026",
-   "startDate": "",
-   "endDate": "",
-   "city": "",
-   "country": "",
+   "startDate": "2026-06-15",
+   "endDate": "2026-06-18",
+   "city": "Denver",
+   "country": "USA",
    "role": "Keynote",
    "confidence": "Unverified",
    "check": "looks right",
@@ -759,6 +759,10 @@ window.TRACKER_DATA = {
   "Vienna|Austria": [
    48.2082,
    16.3738
+  ],
+  "Denver|USA": [
+   39.7392,
+   -104.9849
   ]
  },
  "watch": [
@@ -922,12 +926,20 @@ window.TRACKER_DATA = {
    "editions": {
     "2025": {
      "status": "found",
+     "start": "2025-06-23",
+     "end": "2025-06-26",
+     "city": "Houston",
+     "country": "USA",
      "urls": [
       "https://synbioconference.org/2025/technical-program"
      ]
     },
     "2026": {
      "status": "found",
+     "start": "2026-06-15",
+     "end": "2026-06-18",
+     "city": "Denver",
+     "country": "USA",
      "urls": [
       "https://synbioconference.org/2026/technical-program"
      ]
@@ -943,7 +955,7 @@ window.TRACKER_DATA = {
      ]
     }
    },
-   "lastChecked": "2026-11-12T04:45:18Z",
+   "lastChecked": "2026-11-12T04:52:04Z",
    "lastCheckHits": 0,
    "lastCheckErrors": []
   }
