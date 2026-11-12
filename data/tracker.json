@@ -17,7 +17,8 @@
         "Australian National University",
         "Canberra"
       ],
-      "photoChecked": "2026-11-12"
+      "photoChecked": "2026-11-12",
+      "photoRules": 2
     },
     {
       "id": "david-liu",
@@ -77,7 +78,8 @@
         "MIT",
         "Massachusetts Institute"
       ],
-      "photoChecked": "2026-11-12"
+      "photoChecked": "2026-11-12",
+      "photoRules": 2
     },
     {
       "id": "shohei-koide",
@@ -93,7 +95,8 @@
         "New York University",
         "Langone"
       ],
-      "photoChecked": "2026-11-12"
+      "photoChecked": "2026-11-12",
+      "photoRules": 2
     },
     {
       "id": "feng-zhang",
@@ -111,7 +114,8 @@
         "McGovern",
         "HHMI"
       ],
-      "photoChecked": "2026-11-12"
+      "photoChecked": "2026-11-12",
+      "photoRules": 2
     },
     {
       "id": "wilfred-van-der-donk",
@@ -151,7 +155,8 @@
         "Janelia",
         "HHMI"
       ],
-      "photoChecked": "2026-11-12"
+      "photoChecked": "2026-11-12",
+      "photoRules": 2
     },
     {
       "id": "jeffrey-gray",
@@ -169,7 +174,8 @@
         "JHU",
         "Rosetta"
       ],
-      "photoChecked": "2026-11-12"
+      "photoChecked": "2026-11-12",
+      "photoRules": 2
     },
     {
       "id": "hiroaki-suga",
@@ -184,7 +190,8 @@
         "Tokyo",
         "PeptiDream"
       ],
-      "photoChecked": "2026-11-12"
+      "photoChecked": "2026-11-12",
+      "photoRules": 2
     },
     {
       "id": "hiroshi-murakami",
@@ -198,7 +205,8 @@
       "context": [
         "Nagoya"
       ],
-      "photoChecked": "2026-11-12"
+      "photoChecked": "2026-11-12",
+      "photoRules": 2
     },
     {
       "id": "alex-bronstein",
@@ -216,7 +224,8 @@
         "ISTA",
         "Institute of Science and Technology"
       ],
-      "photoChecked": "2026-11-12"
+      "photoChecked": "2026-11-12",
+      "photoRules": 2
     },
     {
       "id": "nobuhiko-tokuriki",
@@ -234,7 +243,8 @@
       "lastChecked": "2026-11-12T03:16:49Z",
       "lastCheckHits": 1,
       "lastCheckErrors": 0,
-      "photoChecked": "2026-11-12"
+      "photoChecked": "2026-11-12",
+      "photoRules": 2
     },
     {
       "id": "huimin-zhao",
@@ -252,7 +262,8 @@
       "lastChecked": "2026-11-12T05:00:02Z",
       "lastCheckHits": 1,
       "lastCheckErrors": 0,
-      "photoChecked": "2026-11-12"
+      "photoChecked": "2026-11-12",
+      "photoRules": 2
     }
   ],
   "apps": [

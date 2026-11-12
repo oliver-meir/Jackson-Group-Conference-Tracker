@@ -18,7 +18,8 @@ window.TRACKER_DATA = {
     "Australian National University",
     "Canberra"
    ],
-   "photoChecked": "2026-11-12"
+   "photoChecked": "2026-11-12",
+   "photoRules": 2
   },
   {
    "id": "david-liu",
@@ -78,7 +79,8 @@ window.TRACKER_DATA = {
     "MIT",
     "Massachusetts Institute"
    ],
-   "photoChecked": "2026-11-12"
+   "photoChecked": "2026-11-12",
+   "photoRules": 2
   },
   {
    "id": "shohei-koide",
@@ -94,7 +96,8 @@ window.TRACKER_DATA = {
     "New York University",
     "Langone"
    ],
-   "photoChecked": "2026-11-12"
+   "photoChecked": "2026-11-12",
+   "photoRules": 2
   },
   {
    "id": "feng-zhang",
@@ -112,7 +115,8 @@ window.TRACKER_DATA = {
     "McGovern",
     "HHMI"
    ],
-   "photoChecked": "2026-11-12"
+   "photoChecked": "2026-11-12",
+   "photoRules": 2
   },
   {
    "id": "wilfred-van-der-donk",
@@ -152,7 +156,8 @@ window.TRACKER_DATA = {
     "Janelia",
     "HHMI"
    ],
-   "photoChecked": "2026-11-12"
+   "photoChecked": "2026-11-12",
+   "photoRules": 2
   },
   {
    "id": "jeffrey-gray",
@@ -170,7 +175,8 @@ window.TRACKER_DATA = {
     "JHU",
     "Rosetta"
    ],
-   "photoChecked": "2026-11-12"
+   "photoChecked": "2026-11-12",
+   "photoRules": 2
   },
   {
    "id": "hiroaki-suga",
@@ -185,7 +191,8 @@ window.TRACKER_DATA = {
     "Tokyo",
     "PeptiDream"
    ],
-   "photoChecked": "2026-11-12"
+   "photoChecked": "2026-11-12",
+   "photoRules": 2
   },
   {
    "id": "hiroshi-murakami",
@@ -199,7 +206,8 @@ window.TRACKER_DATA = {
    "context": [
     "Nagoya"
    ],
-   "photoChecked": "2026-11-12"
+   "photoChecked": "2026-11-12",
+   "photoRules": 2
   },
   {
    "id": "alex-bronstein",
@@ -217,7 +225,8 @@ window.TRACKER_DATA = {
     "ISTA",
     "Institute of Science and Technology"
    ],
-   "photoChecked": "2026-11-12"
+   "photoChecked": "2026-11-12",
+   "photoRules": 2
   },
   {
    "id": "nobuhiko-tokuriki",
@@ -235,7 +244,8 @@ window.TRACKER_DATA = {
    "lastChecked": "2026-11-12T03:16:49Z",
    "lastCheckHits": 1,
    "lastCheckErrors": 0,
-   "photoChecked": "2026-11-12"
+   "photoChecked": "2026-11-12",
+   "photoRules": 2
   },
   {
    "id": "huimin-zhao",
@@ -253,7 +263,8 @@ window.TRACKER_DATA = {
    "lastChecked": "2026-11-12T05:00:02Z",
    "lastCheckHits": 1,
    "lastCheckErrors": 0,
-   "photoChecked": "2026-11-12"
+   "photoChecked": "2026-11-12",
+   "photoRules": 2
   }
  ],
  "apps": [
@@ -1015,7 +1026,7 @@ window.TRACKER_DATA = {
      ]
     }
    },
-   "lastChecked": "2026-11-12T05:18:08Z",
+   "lastChecked": "2026-11-12T05:29:16Z",
    "lastCheckHits": 0,
    "lastCheckErrors": []
   }
