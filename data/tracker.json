@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-11",
+  "generated": "2026-11-12",
   "profs": [
     {
       "id": "colin-jackson",
@@ -190,6 +190,20 @@
         "ISTA",
         "Institute of Science and Technology"
       ]
+    },
+    {
+      "id": "adam-perriman",
+      "name": "Adam Perriman",
+      "affiliation": "Australian National University",
+      "field": "",
+      "aliases": [],
+      "context": [
+        "Australian National University",
+        "Australian",
+        "National"
+      ],
+      "notes": "",
+      "checkRequested": "2026-11-12T03:11:39Z"
     }
   ],
   "apps": [
