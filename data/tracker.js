@@ -652,6 +652,22 @@ window.TRACKER_DATA = {
    "confidence": "Confirmed",
    "sourceUrl": "https://www.biophysics.org/2027meeting/program/scientific-sessions/symposia",
    "notes": "Auto-found 2026-11-12: ...- 12:45 PM Protein Ancestry and Adaptation Randy Stockbridge, University of Michigan, USA, Chair Banu Ozkan, Arizona State University, USA Nobuhiko Tokuriki, Michael Smith Laboratories, University of British Columbia,"
+  },
+  {
+   "id": "seed-2026-hiroaki-suga",
+   "profId": "hiroaki-suga",
+   "watchId": "seed-2026",
+   "conference": "SEED 2026",
+   "startDate": "",
+   "endDate": "",
+   "city": "Tokyo",
+   "country": "Japan",
+   "role": "Keynote",
+   "confidence": "Unverified",
+   "check": "looks right",
+   "sourceUrl": "https://synbioconference.org/2026/technical-program",
+   "notes": "Auto-found 2026-11-12: ...Peyton Greenside, BigHat Biosciences 9:15 AM 10:00 AM KEYNOTE: LassoGrafting of pseudo-cyclic peptide motifs to proteins for NeoBiologics, Hiroaki Suga, University of Tokyo, Co-founder of Peptidream 10:00 AM 10:30 AM ",
+   "series": "seed"
   }
  ],
  "rejected": [],
@@ -905,39 +921,36 @@ window.TRACKER_DATA = {
    "checkRequested": "2026-11-12T04:37:19Z",
    "editions": {
     "2025": {
-     "status": "found",
-     "start": "2025-06-23",
-     "end": "2025-06-26",
-     "city": "Houston",
-     "country": "USA",
+     "status": "could not read",
      "urls": [
       "https://synbioconference.org/2025/technical-program"
+     ],
+     "problems": [
+      "seed-2025: https://synbioconference.org/2025/technical-program returned almost no text (page may need a browser or has moved)"
      ]
     },
     "2026": {
      "status": "found",
-     "start": "2026-11-08",
-     "end": "2026-11-12",
-     "city": "Minneapolis",
-     "country": "USA",
+     "city": "Tokyo",
+     "country": "Japan",
      "urls": [
       "https://synbioconference.org/2026/technical-program"
      ]
     },
     "2027": {
      "status": "found",
-     "start": "2027-03-21",
-     "end": "2027-03-25",
-     "city": "Minneapolis",
+     "city": "New Orleans",
      "country": "USA",
      "urls": [
       "https://synbioconference.org/2027/technical-program"
      ]
     }
    },
-   "lastChecked": "2026-11-12T04:22:21Z",
-   "lastCheckHits": 0,
-   "lastCheckErrors": []
+   "lastChecked": "2026-11-12T04:37:49Z",
+   "lastCheckHits": 1,
+   "lastCheckErrors": [
+    "seed-2025: https://synbioconference.org/2025/technical-program returned almost no text (page may need a browser or has moved)"
+   ]
   }
  ]
 };
