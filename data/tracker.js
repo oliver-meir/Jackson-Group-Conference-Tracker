@@ -204,7 +204,10 @@ window.TRACKER_DATA = {
     "National"
    ],
    "notes": "",
-   "checkRequested": "2026-11-12T03:11:39Z"
+   "checkRequested": "2026-11-12T03:11:39Z",
+   "lastChecked": "2026-11-12T03:12:28Z",
+   "lastCheckHits": 0,
+   "lastCheckErrors": 0
   }
  ],
  "apps": [
