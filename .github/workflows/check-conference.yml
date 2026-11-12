@@ -1,0 +1,33 @@
+# Runs straight away when someone adds a conference on the website (started by the helper
+# service), or by hand from the Actions tab. Checks last year's, this year's and next year's
+# edition of that conference for every tracked professor and saves the hits as "Unverified".
+name: Check one conference
+
+on:
+  workflow_dispatch:
+    inputs:
+      conf_id:
+        description: "Conference id from data/conferences.json, e.g. lorne-proteins"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: pip install -r requirements.txt
+      - name: Check this conference for every professor
+        run: python scripts/check_watchlist.py --conference "${{ inputs.conf_id }}"
+      - name: Show report
+        if: always()
+        run: cat report.md >> "$GITHUB_STEP_SUMMARY" || true
+      - name: Save results
+        run: bash scripts/save_results.sh "Check conference ${{ inputs.conf_id }}" --conference "${{ inputs.conf_id }}"

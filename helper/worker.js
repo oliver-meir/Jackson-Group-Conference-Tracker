@@ -15,9 +15,13 @@
 //   POST /add-professor    {passphrase, name, affiliation, ...}  add (or re-check) a professor and start the search
 //   POST /recheck          {passphrase, id}                     start the search again for one professor
 //   POST /edit             {passphrase, ops: [...]}             confirm / remove hits, edit entries
+//   POST /add-conference   {passphrase, name, urls, city?, country?}  add a conference to search, and check it now
+//   POST /conference       {passphrase, op, id}                 recheck | enable | disable | delete a conference
 
 const FILE = "data/tracker.json";
+const CONF_FILE = "data/conferences.json";
 const WORKFLOW = "check-professor.yml";
+const CONF_WORKFLOW = "check-conference.yml";
 const MAX_BODY = 50_000;
 
 export default {
@@ -28,7 +32,8 @@ export default {
     try {
       if (!env.GITHUB_TOKEN || !env.REPO) return json({ error: "Helper is not configured yet (GITHUB_TOKEN / REPO missing)." }, 500, cors);
       if (request.method === "GET" && url.pathname === "/data") {
-        const { data } = await getTracker(env);
+        const [{ data }, conf] = await Promise.all([getTracker(env), getJsonFile(env, CONF_FILE, [])]);
+        data.conferences = conf.data;
         return json(data, 200, cors);
       }
       if (request.method === "GET" && url.pathname === "/") {
@@ -47,6 +52,8 @@ export default {
       if (url.pathname === "/add-professor") return json(await addProfessor(body, env), 200, cors);
       if (url.pathname === "/recheck") return json(await recheck(body, env), 200, cors);
       if (url.pathname === "/edit") return json(await edit(body, env), 200, cors);
+      if (url.pathname === "/add-conference") return json(await addConference(body, env), 200, cors);
+      if (url.pathname === "/conference") return json(await conferenceOp(body, env), 200, cors);
       return json({ error: "Not found" }, 404, cors);
     } catch (e) {
       return json({ error: String(e && e.message || e) }, e && e.status || 500, cors);
@@ -156,6 +163,52 @@ function applyOp(data, o) {
   }
 }
 
+async function addConference(body, env) {
+  const name = clean(body.name, 160);
+  if (!name || name.length < 3) throw httpError(400, "Enter the conference name.");
+  const rawUrls = list(typeof body.urls === "string" ? body.urls.split(/[\n,]+/) : body.urls, 10, 500);
+  if (!rawUrls.length) throw httpError(400, "Paste the link to the program or speakers page.");
+  for (const u of rawUrls) if (!/^https?:\/\/[^\s]+\.[^\s]+/i.test(u)) throw httpError(400, `That does not look like a web link: ${u}`);
+  const urls = rawUrls.map((u) => templatize(u));
+  const requestedAt = new Date().toISOString().replace(/\.\d+Z$/, "Z");
+  let id;
+  await updateJsonFile(env, CONF_FILE, [], `Add conference: ${name}`, (list_) => {
+    const same = list_.find((c) => normName(c.name) === normName(name));
+    if (same) { id = same.id; same.urls = urls; same.enabled = true; same.checkRequested = requestedAt;
+      if (body.city) same.city = clean(body.city, 80); if (body.country) same.country = clean(body.country, 80); return list_; }
+    id = uniqueId(slug(name), list_);
+    list_.push({ id, name, urls, city: clean(body.city, 80), country: clean(body.country, 80), enabled: true,
+      added: requestedAt.slice(0, 10), checkRequested: requestedAt });
+    return list_;
+  });
+  await dispatchWorkflow(env, CONF_WORKFLOW, { conf_id: id });
+  return { ok: true, id, requestedAt, urls };
+}
+
+async function conferenceOp(body, env) {
+  const id = clean(body.id, 80), op = body.op;
+  const requestedAt = new Date().toISOString().replace(/\.\d+Z$/, "Z");
+  if (!["recheck", "enable", "disable", "delete"].includes(op)) throw httpError(400, "Unknown change");
+  await updateJsonFile(env, CONF_FILE, [], `Conference ${op}: ${id}`, (list_) => {
+    const i = list_.findIndex((c) => c.id === id);
+    if (i < 0) throw httpError(404, "Conference not found");
+    if (op === "delete") list_.splice(i, 1);
+    else if (op === "enable") list_[i].enabled = true;
+    else if (op === "disable") list_[i].enabled = false;
+    else { list_[i].enabled = true; list_[i].checkRequested = requestedAt; }
+    return list_;
+  });
+  if (op === "recheck" || op === "enable") await dispatchWorkflow(env, CONF_WORKFLOW, { conf_id: id });
+  return { ok: true, id, requestedAt };
+}
+
+// a link with a year in it becomes a pattern, so next year's edition is checked automatically
+function templatize(u) {
+  const years = u.match(/(?<!\d)20\d\d(?!\d)/g);
+  if (!years) return u;
+  return u.split(years[years.length - 1]).join("{year}");
+}
+
 // ---------- GitHub ----------
 
 function gh(env, path, init = {}) {
@@ -171,15 +224,35 @@ function gh(env, path, init = {}) {
   });
 }
 
-async function getTracker(env) {
+async function getJsonFile(env, path, fallback) {
   const branch = env.BRANCH || "main";
-  const r = await gh(env, `/contents/${FILE}?ref=${branch}`);
-  if (!r.ok) throw httpError(502, `GitHub said ${r.status} when reading the data. Check REPO and the token.`);
+  const r = await gh(env, `/contents/${path}?ref=${branch}`);
+  if (r.status === 404 && fallback !== undefined) return { data: structuredClone(fallback), sha: undefined };
+  if (!r.ok) throw httpError(502, `GitHub said ${r.status} when reading ${path}. Check REPO and the token.`);
   const j = await r.json();
-  const data = JSON.parse(b64decode(j.content));
+  return { data: JSON.parse(b64decode(j.content)), sha: j.sha };
+}
+
+async function getTracker(env) {
+  const { data, sha } = await getJsonFile(env, FILE);
   data.profs = data.profs || [];
   data.apps = data.apps || [];
-  return { data, sha: j.sha };
+  return { data, sha };
+}
+
+async function updateJsonFile(env, path, fallback, message, mutate) {
+  const branch = env.BRANCH || "main";
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const { data, sha } = await getJsonFile(env, path, fallback);
+    const out = mutate(data);
+    const payload = { message, content: b64encode(JSON.stringify(out, null, 2) + "\n"), branch };
+    if (sha) payload.sha = sha;
+    const r = await gh(env, `/contents/${path}`, { method: "PUT", body: JSON.stringify(payload), headers: { "Content-Type": "application/json" } });
+    if (r.ok) return out;
+    if (r.status === 409 || r.status === 422) { await sleep(400 * (attempt + 1)); continue; }
+    throw httpError(502, `GitHub said ${r.status} when saving. Check the token has Contents: read and write.`);
+  }
+  throw httpError(503, "Too many changes at once. Try again in a moment.");
 }
 
 async function updateTracker(env, message, mutate) {
@@ -197,11 +270,13 @@ async function updateTracker(env, message, mutate) {
   throw httpError(503, "Too many changes at once. Try again in a moment.");
 }
 
-async function dispatch(env, profId) {
-  const r = await gh(env, `/actions/workflows/${WORKFLOW}/dispatches`, {
+async function dispatch(env, profId) { return dispatchWorkflow(env, WORKFLOW, { prof_id: profId }); }
+
+async function dispatchWorkflow(env, workflow, inputs) {
+  const r = await gh(env, `/actions/workflows/${workflow}/dispatches`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ ref: env.BRANCH || "main", inputs: { prof_id: profId } }),
+    body: JSON.stringify({ ref: env.BRANCH || "main", inputs }),
   });
   if (r.status !== 204) throw httpError(502, `Saved, but GitHub said ${r.status} when starting the search. Check the token has Actions: read and write.`);
 }

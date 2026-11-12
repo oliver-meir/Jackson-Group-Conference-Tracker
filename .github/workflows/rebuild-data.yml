@@ -8,6 +8,8 @@ on:
     branches: [main]
     paths:
       - data/tracker.json
+      - data/conferences.json
+      - watchlist.yaml
   workflow_dispatch:
 
 permissions:

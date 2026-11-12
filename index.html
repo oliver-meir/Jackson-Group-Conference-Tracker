@@ -107,6 +107,16 @@ main{padding:16px 20px;min-width:0;display:flex;flex-direction:column;gap:14px}
 .spin{display:inline-block;width:12px;height:12px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sp 0.9s linear infinite;vertical-align:-2px;margin-right:6px}
 @keyframes sp{to{transform:rotate(360deg)}}
 .addbox{display:flex;flex-direction:column;gap:6px}
+.sl{display:flex;flex-direction:column;gap:10px;max-width:980px}
+.sl .card{gap:6px}
+.sl .links{font-size:12.5px;word-break:break-all;color:var(--muted)}
+.sl .eds{display:flex;flex-wrap:wrap;gap:6px}
+.ed{border:1px solid var(--line);border-radius:4px;padding:3px 8px;font-size:12.5px}
+.ed.found{border-color:var(--up);color:var(--up)}
+.ed.bad{border-color:var(--warn);color:var(--warn)}
+.sl .row2{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.hint{font-size:12.5px;color:var(--muted);margin-top:2px}
+.hint.warn{color:var(--warn)}
 .addbox:empty{display:none}
 #jobs .banner{margin-bottom:6px}
 .confs{display:flex;flex-direction:column;gap:10px}
@@ -187,6 +197,7 @@ tr:last-child td{border-bottom:none}
       <a href="#conferences" data-view="conferences">By conference</a>
       <a href="#table" data-view="table">Table</a>
       <a href="#map" data-view="map">Map</a>
+      <a href="#searchlist" data-view="searchlist">Conferences searched</a>
       <a href="#about" data-view="about">About</a>
     </nav>
     <div class="filters">
@@ -216,8 +227,10 @@ tr:last-child td{border-bottom:none}
 <p>Type their name in the box on the left. If they are not tracked yet, click <strong>Add and search</strong>, add their university, and submit. The tracker adds them, searches every conference program it knows about, and shows the hits here in about 2 to 3 minutes. From then on they are included in the weekly check every Monday morning. The first time you make a change on a browser you are asked for the lab passphrase.</p>
 <h2>Reviewing hits</h2>
 <p>New hits are marked <strong>Unverified</strong> with a flag: <em>Looks right</em> (full name found with their university nearby) or <em>Check carefully</em> (initials only, or no university nearby, so it may be someone with the same name). Read the snippet or open the source, then click <strong>Confirm</strong> or <strong>Remove</strong>. Removed hits are not suggested again. Tick <strong>Hide unverified</strong> to see only checked entries.</p>
+<h2>Adding a conference</h2>
+<p>Open <strong>Conferences searched</strong> and click <strong>Add conference to search</strong>. Paste the link to its program or invited speakers page, from any year. If the link contains a year (most do, e.g. proteins-2026 or 2026meeting), the tracker checks last year's, this year's and next year's editions and keeps rolling forward on its own: next year's edition is picked up as soon as its site goes online. Every tracked professor is checked against it straight away, and every Monday after that. Dates and city are read off the page where possible. If a page cannot be read, the tab says so, so you can try another link such as the program PDF.</p>
 <h2>What it can and cannot find</h2>
-<p>It searches the conference program and speaker pages listed in the repository's <code>watchlist.yaml</code>, past and upcoming. It does not search the whole web, so talks at conferences that are not on the list will not be found. Adding a conference means adding its program link to <code>watchlist.yaml</code> on GitHub. No AI is used, just name matching.</p>
+<p>It searches the program and speaker pages of the conferences on the Conferences searched tab, for every professor. It does not search the whole web, so talks at conferences that are not on the list will not be found, and a conference is only searchable once its program or speaker list is published. No AI is used, just name matching.</p>
 <h2>Other features</h2>
 <ul>
 <li><strong>Check a speaker list:</strong> paste any program text to see which tracked professors are named in it, and save the matches.</li>
@@ -400,13 +413,14 @@ tr:last-child td{border-bottom:none}
     var list=filtered();
     $("fCount").textContent=state.loaded?list.length+" shown":"";
     var v=state.view,h;
-    document.querySelector(".filters").style.display=v==="about"?"none":"";
+    document.querySelector(".filters").style.display=(v==="about"||v==="searchlist")?"none":"";
     if(!state.loaded){h='<div class="note">Loading data...</div>'}
     else if(v==="timeline")h=renderTimeline(list);
     else if(v==="conferences")h=renderConfs(list);
     else if(v==="table")h=renderTable(list);
     else if(v==="map")h='<div id="map"></div><div class="nomap" id="nomap"></div>';
     else if(v==="about")h=document.getElementById("aboutTpl").innerHTML;
+    else if(v==="searchlist")h=renderSearchList();
     else h=renderOverview(list);
     if(state.map){state.map.remove();state.map=null}
     $("view").innerHTML=h;
@@ -435,7 +449,7 @@ tr:last-child td{border-bottom:none}
   }
 
   // routing
-  function route(){var h=(location.hash||"").slice(1);state.view=["overview","timeline","conferences","table","map","about"].indexOf(h)>=0?h:"overview";render()}
+  function route(){var h=(location.hash||"").slice(1);state.view=["overview","timeline","conferences","table","map","searchlist","about"].indexOf(h)>=0?h:"overview";render()}
   window.addEventListener("hashchange",route);
 
   // events
@@ -448,6 +462,10 @@ tr:last-child td{border-bottom:none}
   $("view").addEventListener("click",function(e){
     var t;
     if((t=e.target.closest("[data-open]"))){state.sel=t.dataset.open;location.hash="timeline";return}
+    if((t=e.target.closest("[data-addconf]"))){ensurePass(function(){openAddConference()});return}
+    if((t=e.target.closest("[data-confop]"))){var cid=t.dataset.id,cop=t.dataset.confop,cb=t;
+      if(cop==="delete"&&cb.dataset.armed!=="1"){cb.dataset.armed="1";cb.textContent="Click again to delete";return}
+      ensurePass(function(){confOp(cop,cid,cb)});return}
     if((t=e.target.closest("[data-confirm]"))){review("confirm",t.dataset.confirm,t);return}
     if((t=e.target.closest("[data-reject]"))){review("reject",t.dataset.reject,t);return}
     if((t=e.target.closest("[data-recheck]"))){ensurePass(function(){startRecheck(t.dataset.recheck)});return}
@@ -669,11 +687,12 @@ tr:last-child td{border-bottom:none}
   }
   function jobs(){try{return JSON.parse(localStorage.getItem(JOBKEY)||"[]")}catch(e){return state.jobs||[]}}
   function saveJobs(j){state.jobs=j;try{localStorage.setItem(JOBKEY,JSON.stringify(j))}catch(e){}}
-  function addJob(id,name,at){var j=jobs().filter(function(x){return x.id!==id});j.push({id:id,name:name,at:at,started:Date.now()});saveJobs(j);renderJobs();pollSoon()}
+  function addJob(id,name,at,kind){var j=jobs().filter(function(x){return !(x.id===id&&(x.kind||"prof")===(kind||"prof"))});j.push({id:id,name:name,at:at,kind:kind||"prof",started:Date.now()});saveJobs(j);renderJobs();pollSoon()}
   function checkJobs(){
     var j=jobs(),changed=false;
-    j.forEach(function(x){var p=prof(x.id);
-      if(!x.done&&p&&p.lastChecked&&p.lastChecked>=x.at){x.done=true;x.hits=p.lastCheckHits||0;x.errors=p.lastCheckErrors||0;changed=true}
+    j.forEach(function(x){var p=x.kind==="conf"?(state.confs||[]).filter(function(c){return c.id===x.id})[0]:prof(x.id);
+      if(!x.done&&p&&p.lastChecked&&p.lastChecked>=x.at){x.done=true;x.hits=p.lastCheckHits||0;x.errors=Array.isArray(p.lastCheckErrors)?p.lastCheckErrors.length:(p.lastCheckErrors||0);
+        if(x.kind==="conf"){var e=p.editions||{};x.eds=Object.keys(e).sort().map(function(k){return (k==="page"?"current page":k)+": "+e[k].status}).join(", ");x.errText=(p.lastCheckErrors||[]).join("; ")}changed=true}
       if(!x.done&&Date.now()-x.started>15*60000&&!x.slow){x.slow=true;changed=true}
       if(!p&&!x.done){x.gone=true}});
     if(changed)saveJobs(j);renderJobs();
@@ -686,6 +705,8 @@ tr:last-child td{border-bottom:none}
     var j=jobs().filter(function(x){return !x.gone});
     $("jobs").innerHTML=j.map(function(x){
       var mins=Math.max(0,Math.round((Date.now()-x.started)/60000));
+      if(x.done&&x.kind==="conf")return '<div class="banner'+(x.errors&&!x.hits?" warn":"")+'">Finished checking <strong>'+esc(x.name)+'</strong> for every professor: '+(x.hits?x.hits+' new possible appearance'+(x.hits>1?'s':'')+'. Review them with Confirm or Remove.':'no tracked professors found on it yet.')+(x.eds?' Editions: '+esc(x.eds)+'.':'')+(x.errText?' Could not read: '+esc(x.errText)+'. Try a different link, e.g. the PDF of the program.':'')+' <button class="btn link" type="button" data-jobconf="1">Show</button> <button class="btn link" type="button" data-jobclose="'+esc(x.id)+'">Dismiss</button></div>';
+      if(!x.done&&!x.slow&&x.kind==="conf")return '<div class="banner"><span class="spin"></span>Checking <strong>'+esc(x.name)+'</strong> for every professor. Started '+(Math.max(0,Math.round((Date.now()-x.started)/60000))||"just now")+(Math.round((Date.now()-x.started)/60000)?" min ago":"")+', usually takes 2 to 3 minutes. You can keep using the site.</div>';
       if(x.done)return '<div class="banner">Search finished for <strong>'+esc(x.name)+'</strong>: '+(x.hits?x.hits+' new possible appearance'+(x.hits>1?'s':'')+'. Review them with Confirm or Remove.':'no new appearances on the conference programs the tracker knows about.')+(x.errors?' ('+x.errors+' page'+(x.errors>1?'s':'')+' could not be read.)':'')+' <button class="btn link" type="button" data-jobshow="'+esc(x.id)+'">Show</button> <button class="btn link" type="button" data-jobclose="'+esc(x.id)+'">Dismiss</button></div>';
       if(x.slow)return '<div class="banner warn">The search for <strong>'+esc(x.name)+'</strong> is taking longer than usual. It may still finish; if not, check the Actions tab on GitHub. <button class="btn link" type="button" data-jobclose="'+esc(x.id)+'">Dismiss</button></div>';
       return '<div class="banner"><span class="spin"></span>Searching conference programs for <strong>'+esc(x.name)+'</strong>. Started '+(mins?mins+' min ago':'just now')+', usually takes 2 to 3 minutes. You can keep using the site.</div>';
@@ -693,6 +714,7 @@ tr:last-child td{border-bottom:none}
   }
   $("jobs").addEventListener("click",function(e){var t;
     if((t=e.target.closest("[data-jobshow]"))){state.sel=t.dataset.jobshow;location.hash="timeline";render()}
+    if((t=e.target.closest("[data-jobconf]"))){location.hash="searchlist"}
     if((t=e.target.closest("[data-jobclose]"))){saveJobs(jobs().filter(function(x){return x.id!==t.dataset.jobclose}));renderJobs()}
   });
   function renderAddBox(){
@@ -701,6 +723,75 @@ tr:last-child td{border-bottom:none}
     $("addbox").innerHTML=(q&&!hit?'<div class="note">No tracked professor matches "'+esc(q)+'".</div>':'')+
       '<button class="btn primary" type="button" id="btnAddSearch">'+(q&&!hit?'Add "'+esc(q.length>28?q.slice(0,28)+"...":q)+'" and search':'Add a professor and search')+'</button>';
     $("btnAddSearch").onclick=function(){var v=$("pSearch").value.trim();ensurePass(function(){openAddSearch(hit?"":v)})};
+  }
+
+  // ---------- conferences being searched ----------
+  var YEAR_RE=/(?:^|[^0-9])(20[0-9][0-9])(?![0-9])/;
+  function linkHint(u){
+    u=u.trim();if(!u)return "";
+    if(!/^https?:\/\/\S+\.\S+/i.test(u))return '<div class="hint warn">'+esc(u)+': not a web link (should start with https://)</div>';
+    var y=(u.match(/(?:^|[^0-9])(20[0-9][0-9])(?![0-9])/g)||[]).pop();
+    var day=/20[0-9][0-9]-[01][0-9]-[0-3][0-9]/.test(u);
+    if(y){y=y.replace(/[^0-9]/g,"");var Y=new Date().getFullYear();
+      return '<div class="hint">Year '+y+' found in the link: the tracker will check the '+(Y-1)+', '+Y+' and '+(Y+1)+' editions and keep rolling forward each year.</div>'+(day?'<div class="hint warn">This looks like a single-day page. Next year the dates will differ, so use the main program or speakers page if there is one.</div>':'');}
+    return '<div class="hint">No year in this link: the page is checked as it is every week, and new programs posted there are picked up.</div>';
+  }
+  function openAddConference(){
+    openDlg('<h2>Add conference to search</h2><p class="note" style="margin:0">Paste the link to the conference program or invited speakers page, from any year. The tracker checks every tracked professor against it now, keeps checking future editions every Monday, and reads the dates and city off the page.</p>'+
+      '<form class="form" id="fc"><label class="full" for="cName">Conference name<input id="cName" placeholder="e.g. Lorne Proteins Conference"></label>'+
+      '<label class="full" for="cUrls">Program or speakers page link (one per line if there are several)<textarea id="cUrls" placeholder="https://proteins-2026.p.asnevents.com.au/"></textarea></label>'+
+      '<div class="full" id="cHints"></div>'+
+      '<label for="cCity">City (optional, normally read from the page)<input id="cCity"></label>'+
+      '<label for="cCountry">Country (optional)<input id="cCountry"></label></form>'+
+      '<div class="err" id="cErr"></div><div class="row"><button class="btn" type="button" id="cCancel">Cancel</button><button class="btn primary" type="button" id="cGo">Add and check</button></div>');
+    $("cCancel").onclick=closeDlg;
+    $("cUrls").oninput=function(){$("cHints").innerHTML=$("cUrls").value.split(/\n+/).map(linkHint).join("")};
+    $("cGo").onclick=async function(){
+      var name=val("cName"),urls=$("cUrls").value.split(/\n+/).map(function(x){return x.trim()}).filter(Boolean);
+      if(name.length<3){$("cErr").textContent="Enter the conference name.";return}
+      if(!urls.length){$("cErr").textContent="Paste the link to the program or speakers page.";return}
+      $("cGo").disabled=true;$("cGo").innerHTML='<span class="spin"></span>Starting check';
+      try{var res=await helper("/add-conference",{name:name,urls:urls.join("\n"),city:val("cCity"),country:val("cCountry")});
+        addJob(res.id,name,res.requestedAt,"conf");closeDlg();await refreshLive();location.hash="searchlist";render()}
+      catch(err){$("cGo").disabled=false;$("cGo").textContent="Add and check";$("cErr").textContent=err.message}
+    };
+  }
+  async function confOp(op,id,btn){
+    if(btn){btn.disabled=true}
+    try{var res=await helper("/conference",{op:op,id:id});
+      if(op==="recheck"||op==="enable"){var c=(state.confs||[]).filter(function(x){return x.id===id})[0];addJob(id,c?c.name:id,res.requestedAt,"conf")}
+      await refreshLive();toast(op==="delete"?"Conference removed from the search":op==="disable"?"Turned off":"Check started")}
+    catch(err){toast(err.message);render()}
+  }
+  function fmtEd(y,e){
+    var cls=e.status==="found"?"found":(e.status==="could not read"?"bad":"");
+    var bits=[y==="page"?"Current page":y,e.status];
+    if(e.start)bits.push(fmtRange({startDate:e.start,endDate:e.end}));
+    if(e.city||e.country)bits.push([e.city,e.country].filter(Boolean).join(", "));
+    return '<span class="ed '+cls+'" title="'+esc((e.problems||[]).join("\n"))+'">'+esc(bits.join(" · "))+'</span>';
+  }
+  function renderSearchList(){
+    var confs=state.confs||[],watch=state.watch||[],h='<div class="sl">';
+    h+='<div class="row2"><span class="note">The tracker searches the program and speaker pages of these conferences for every tracked professor: right away when something is added, and every Monday.</span>'+(LIVE?' <button class="btn primary" type="button" data-addconf="1">Add conference to search</button>':'')+'</div>';
+    h+='<h2 style="font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:8px 0 0;font-weight:500">Added on this site ('+confs.length+')</h2>';
+    if(!confs.length)h+='<div class="note">None yet.'+(LIVE?' Click "Add conference to search" to add one.':'')+'</div>';
+    confs.slice().sort(function(a,b){return a.name.localeCompare(b.name)}).forEach(function(c){
+      var yearly=(c.urls||[]).some(function(u){return u.indexOf("{year}")>=0});
+      var eds=c.editions||{},keys=Object.keys(eds).sort();
+      var hits=state.apps.filter(function(a){return a.series===c.id}).length;
+      h+='<div class="card"><div class="row2"><h3>'+esc(c.name)+'</h3>'+(c.enabled===false?'<span class="pill tbc">Off</span>':'')+'</div>'+
+        '<div class="links">'+(c.urls||[]).map(function(u){return esc(u)}).join("<br>")+'</div>'+
+        '<div class="note">'+(yearly?'Rolls forward: last year, this year and next year are checked.':'Checked as it is every week.')+' '+hits+' appearance'+(hits===1?'':'s')+' found so far.'+(c.lastChecked?' Last checked '+esc(c.lastChecked.slice(0,16).replace("T"," "))+' UTC.':' Not checked yet.')+'</div>'+
+        (keys.length?'<div class="eds">'+keys.map(function(k){return fmtEd(k,eds[k])}).join("")+'</div>':'')+
+        ((c.lastCheckErrors||[]).length?'<div class="hint warn">Could not read: '+esc(c.lastCheckErrors.join("; "))+'. Try a different link, e.g. the PDF of the program.</div>':'')+
+        (LIVE?'<div class="row2"><button class="btn small" type="button" data-confop="recheck" data-id="'+esc(c.id)+'">Check now</button>'+
+          '<button class="btn small" type="button" data-confop="'+(c.enabled===false?"enable":"disable")+'" data-id="'+esc(c.id)+'">'+(c.enabled===false?"Turn on":"Turn off")+'</button>'+
+          '<button class="btn small" type="button" data-confop="delete" data-id="'+esc(c.id)+'">Delete</button></div>':'')+'</div>';
+    });
+    h+='<h2 style="font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:14px 0 0;font-weight:500">From watchlist.yaml ('+watch.length+')</h2><div class="note">Fixed editions set up in the repository. Change these by editing watchlist.yaml on GitHub.</div>';
+    h+='<div class="tablewrap"><table><thead><tr><th>Conference</th><th>Dates</th><th>Place</th><th>Status</th><th>Links</th></tr></thead><tbody>'+
+      watch.map(function(w){return '<tr><td>'+esc(w.conference)+'</td><td class="mono">'+esc(w.start?fmtRange({startDate:w.start,endDate:w.end}):"TBC")+'</td><td>'+esc([w.city,w.country].filter(Boolean).join(", "))+'</td><td>'+(w.enabled===false?'<span class="pill tbc">Off</span>':'<span class="pill past">On</span>')+'</td><td>'+(w.urls||[]).map(function(u,i){return '<a href="'+esc(u)+'" target="_blank" rel="noopener">Link'+((w.urls||[]).length>1?" "+(i+1):"")+'</a>'}).join(" ")+'</td></tr>'}).join("")+'</tbody></table></div>';
+    return h+'</div>';
   }
 
   // data: data/tracker.js (built from data/tracker.json) + this browser's unsaved edits
@@ -732,7 +823,9 @@ tr:last-child td{border-bottom:none}
       collection:function(col){return{add:async function(b){return liveEdit([{op:"setApp",data:b}])}}}
     };
   }
-  function load(d){state.profs=(d.profs||[]).map(function(x){return Object.assign({},x)});state.apps=(d.apps||[]).map(function(x){return Object.assign({},x)})}
+  function load(d){
+    if(Array.isArray(d.conferences))state.confs=d.conferences.map(function(x){return Object.assign({},x)});
+    if(Array.isArray(d.watch))state.watch=d.watch;state.profs=(d.profs||[]).map(function(x){return Object.assign({},x)});state.apps=(d.apps||[]).map(function(x){return Object.assign({},x)})}
   var SEED=window.TRACKER_DATA||{profs:[],apps:[],generated:"",geo:{}};
   var GEO=SEED.geo||{};
   function sig(d){return (d.generated||"")+"|"+(d.profs||[]).length+"|"+(d.apps||[]).length}

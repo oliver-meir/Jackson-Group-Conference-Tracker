@@ -151,3 +151,60 @@ def test_rejected_hits_are_not_suggested_again(tmp_path, monkeypatch):
     out = json.loads((repo / "data" / "tracker.json").read_text())
     ids = {a["profId"] for a in out["apps"] if a.get("watchId") == "demo-2027"}
     assert ids == {"shohei-koide", "luke-lavis"}
+
+
+def test_dates_and_places_read_off_pages():
+    from editions import describe_edition, templatize
+    assert templatize("https://proteins-2026.p.asnevents.com.au/") == ("https://proteins-{year}.p.asnevents.com.au/", True)
+    assert templatize("https://ozpeptide.org/") == ("https://ozpeptide.org/", False)
+    assert describe_edition("8–12 February 2026, Mantra Lorne. Deadline 30 October 2025", 2026) == \
+        {"start": "2026-02-08", "end": "2026-02-12", "city": "Lorne", "country": "Australia"}
+    assert describe_edition("Join us February 20-24, 2027 in Philadelphia", None)["start"] == "2027-02-20"
+    assert describe_edition("6 - 11th of September 2026, Vienna", 2026)["end"] == "2026-09-11"
+    assert describe_edition("Sunday 30 June – Wednesday 3 July 2027, Boston", 2027)["end"] == "2027-07-03"
+    assert "start" not in describe_edition("Registration closes 1 March 2027.", 2027)
+
+
+def test_conference_series_rolls_forward(tmp_path, monkeypatch):
+    cw, repo = _repo(tmp_path, monkeypatch)
+    monkeypatch.setattr(cw, "SERIES", repo / "data" / "conferences.json")
+    monkeypatch.setenv("TRACKER_TODAY", "2026-11-12")
+    (repo / "data" / "conferences.json").write_text(json.dumps([
+        {"id": "lorne-proteins", "name": "Lorne Proteins Conference",
+         "urls": ["https://proteins-{year}.p.asnevents.com.au/"], "enabled": True},
+        {"id": "peptide", "name": "Australian Peptide Conference", "urls": ["https://ozpeptide.org/"], "enabled": True},
+    ]))
+    # fixtures exist for lorne-proteins-2026 and peptide-page; 2025 and 2027 editions are "not published"
+    assert cw.main(["--from-dir", str(ROOT / "tests" / "fixtures"), "--conference", "lorne-proteins"]) == 0
+    data = json.loads((repo / "data" / "tracker.json").read_text())
+    hit = next(a for a in data["apps"] if a.get("watchId") == "lorne-proteins-2026")
+    assert hit["profId"] == "colin-jackson" and hit["role"] == "Invited talk"
+    assert (hit["startDate"], hit["endDate"], hit["city"]) == ("2026-02-08", "2026-02-12", "Lorne")
+    assert hit["conference"] == "Lorne Proteins Conference 2026"
+    series = json.loads((repo / "data" / "conferences.json").read_text())
+    lorne = series[0]
+    assert lorne["editions"]["2026"]["status"] == "found"
+    assert lorne["editions"]["2027"]["status"] == "not published yet"
+    assert lorne["lastCheckHits"] == 1 and lorne["lastCheckErrors"] == [] and lorne["lastChecked"]
+    assert "lastChecked" not in series[1]  # only the requested series was checked
+
+    # a page without a year in the link is checked as-is, and dates/places come off the page
+    assert cw.main(["--from-dir", str(ROOT / "tests" / "fixtures"), "--conference", "peptide"]) == 0
+    data = json.loads((repo / "data" / "tracker.json").read_text())
+    suga = next(a for a in data["apps"] if a.get("watchId") == "peptide-page")
+    assert suga["profId"] == "hiroaki-suga" and suga["city"] == "Port Douglas" and suga["startDate"] == "2027-10-17"
+
+    # adding a professor later checks them against the series too
+    data["profs"].append({"id": "x-tester", "name": "Lauren Smith", "aliases": [], "context": []})
+    (repo / "data" / "tracker.json").write_text(json.dumps(data))
+    assert cw.main(["--from-dir", str(ROOT / "tests" / "fixtures"), "--only", "x-tester"]) == 0
+    data = json.loads((repo / "data" / "tracker.json").read_text())
+    assert any(a["profId"] == "x-tester" and a["watchId"] == "lorne-proteins-2026" for a in data["apps"])
+
+
+def test_chair_label_of_neighbour_is_not_used():
+    p = {"id": "nt", "name": "Nobuhiko Tokuriki", "aliases": [], "context": ["British Columbia"]}
+    text = ("10:45 AM Protein Ancestry and Adaptation Randy Stockbridge, University of Michigan, USA, Chair "
+            "Banu Ozkan, Arizona State University, USA Nobuhiko Tokuriki, Michael Smith Laboratories, University of British Columbia")
+    m = find_professor(text, p)
+    assert m and m.role != "Session chair"

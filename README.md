@@ -28,10 +28,13 @@ photos/                        optional professor photos, named <professor id>.j
 watchlist.yaml                 conference pages and professor pages the weekly check reads
 scripts/check_watchlist.py     the weekly check
 scripts/matcher.py             name matching rules
+scripts/editions.py            yearly roll-forward for conferences, and reading dates/places off pages
+scripts/places.py              list of conference cities used to read locations
+data/conferences.json          conferences added on the website
 scripts/build_outputs.py       rebuilds tracker.js, talks.ics and map coordinates
 scripts/save_results.sh        saves the checker's results, retrying if someone saved at the same time
 tests/                         tests, including an offline sample program page
-.github/workflows/             weekly-check.yml, check-professor.yml, rebuild-data.yml, tests.yml
+.github/workflows/             weekly-check.yml, check-professor.yml, check-conference.yml, rebuild-data.yml, tests.yml
 ```
 
 ## First-time setup (about 20 minutes)
@@ -67,7 +70,8 @@ If the token expires or is revoked, the site keeps showing data but saving fails
 
 - **Add a professor:** type the name in the box on the left, click Add and search, add their university. Hits show up in 2 to 3 minutes. They are in the Monday check from then on.
 - **Review hits:** new hits are Unverified, flagged "Looks right" or "Check carefully". Click Confirm or Remove. Removed hits are remembered in `rejected` in tracker.json and not suggested again.
-- **Search again:** on a professor's timeline, "Search conferences again" re-runs the check for them (useful after adding conferences to the watchlist).
+- **Search again:** on a professor's timeline, "Search conferences again" re-runs the check for them.
+- **Add a conference:** Conferences searched tab, Add conference to search. Paste the program or speakers page link from any year. A year in the link (e.g. `proteins-2026`, `2026meeting`) becomes a pattern, so last year's, this year's and next year's editions are all checked and the search rolls forward by itself. A link without a year is checked as it is each week. Dates and city are read off the page (cities are matched against `scripts/places.py`; add a city there if one is missing). Site-added conferences live in `data/conferences.json`; `watchlist.yaml` still works for fixed editions.
 
 ## Weekly routine (5 minutes)
 

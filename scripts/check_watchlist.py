@@ -26,6 +26,7 @@ from bs4 import BeautifulSoup
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from matcher import find_all, normalise  # noqa: E402
+from editions import describe_edition, expand_series  # noqa: E402
 import build_outputs  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -35,6 +36,7 @@ HASHES = DATA / "page_hashes.json"
 STATUS = DATA / "check_status.json"
 REPORT = ROOT / "report.md"
 WATCHLIST = ROOT / "watchlist.yaml"
+SERIES = DATA / "conferences.json"
 
 USER_AGENT = "LabConferenceTracker/1.0 (academic, weekly check; contact via repo)"
 EVENT_WORDS = r"\b(symposium|conference|congress|meeting|keynote|plenary|invited|workshop|summit|lecture|talk|speaker|gordon|keystone)\b"
@@ -96,24 +98,69 @@ def already_logged(apps: list[dict], prof_id: str, watch: dict) -> bool:
     return False
 
 
-def check_conferences(watchlist, tracker, getter, report, errors, only=None):
+def _not_published(exc) -> bool:
+    """For next/last year's edition, a missing page just means it is not online (yet)."""
+    if isinstance(exc, FileNotFoundError):
+        return True
+    if isinstance(exc, requests.HTTPError) and exc.response is not None and exc.response.status_code in (404, 410):
+        return True
+    return isinstance(exc, (requests.ConnectionError,))
+
+
+def build_entries(watchlist, series_list, only_series=None, today=None):
+    """Everything to check this run: fixed conferences from watchlist.yaml plus every edition of
+    the conference series added on the website (data/conferences.json)."""
+    entries = []
+    if only_series is None:
+        for w in watchlist.get("conferences", []) or []:
+            if w.get("enabled", True):
+                entries.append(dict(w, optional=False, series=None, year=None))
+    for srs in series_list:
+        if only_series is not None and srs["id"] != only_series:
+            continue
+        if not srs.get("enabled", True):
+            continue
+        entries.extend(expand_series(srs, today))
+    return entries
+
+
+def check_conferences(entries, tracker, getter, report, errors, only=None, editions_out=None):
     profs = [p for p in tracker["profs"] if not p.get("paused") and (only is None or p["id"] == only)]
     rejected = set(tracker.get("rejected") or [])
     new_rows = []
-    for watch in watchlist.get("conferences", []):
-        if not watch.get("enabled", True):
-            continue
+    for watch in entries:
         urls = watch.get("urls") or []
-        texts = []
+        texts, problems, missing = [], [], 0
         for idx, url in enumerate(urls):
             try:
                 texts.append((url, getter(url, f'{watch["id"]}' + (f"-{idx}" if idx else ""))))
             except Exception as e:  # noqa: BLE001
-                errors.append(f'{watch["id"]}: could not read {url} ({type(e).__name__}: {str(e)[:120]})')
+                if watch.get("optional") and _not_published(e):
+                    missing += 1
+                else:
+                    problems.append(f'{watch["id"]}: could not read {url} ({type(e).__name__}: {str(e)[:120]})')
+        good = []
         for url, text in texts:
             if len(text) < 200:
-                errors.append(f'{watch["id"]}: {url} returned almost no text (page may need a browser or has moved)')
-                continue
+                problems.append(f'{watch["id"]}: {url} returned almost no text (page may need a browser or has moved)')
+            elif watch.get("year") and str(watch["year"]) not in text:
+                missing += 1  # site answered but shows another year's page: this edition is not online yet
+            else:
+                good.append((url, text))
+        status = "found" if good else ("not published yet" if missing and not problems else "could not read")
+        info = {}
+        if good and watch.get("series"):
+            info = describe_edition(" ".join(t for _, t in good), watch.get("year"))
+        start = str(watch.get("start") or info.get("start") or "")
+        end_ = str(watch.get("end") or info.get("end") or "")
+        city = watch.get("city") or info.get("city", "")
+        country = watch.get("country") or info.get("country", "")
+        if editions_out is not None and watch.get("series"):
+            editions_out.setdefault(watch["series"], {})[str(watch.get("year") or "page")] = {
+                k: v for k, v in {"status": status, "start": start, "end": end_, "city": city,
+                                  "country": country, "urls": urls, "problems": problems}.items() if v}
+        errors.extend(problems)
+        for url, text in good:
             for m in find_all(text, profs):
                 if m.prof_id in (watch.get("ignore") or []) or f'{watch["id"]}:{m.prof_id}' in rejected:
                     continue
@@ -124,16 +171,19 @@ def check_conferences(watchlist, tracker, getter, report, errors, only=None):
                     "profId": m.prof_id,
                     "watchId": watch["id"],
                     "conference": watch["conference"],
-                    "startDate": str(watch.get("start") or ""),
-                    "endDate": str(watch.get("end") or ""),
-                    "city": watch.get("city", ""),
-                    "country": watch.get("country", ""),
+                    "startDate": start,
+                    "endDate": end_,
+                    "city": city,
+                    "country": country,
                     "role": m.role,
                     "confidence": "Unverified",
                     "check": "looks right" if m.confident else f"check carefully: {m.reason}",
                     "sourceUrl": url,
-                    "notes": f"Auto-found {dt.date.today().isoformat()}: {m.snippet[:220]}",
+                    "notes": f"Auto-found {dt.date.today().isoformat()}: {m.snippet[:220]}"
+                             + ("" if watch.get("start") or not info.get("start") else " (dates read from the page, please check)"),
                 }
+                if watch.get("series"):
+                    row["series"] = watch["series"]
                 new_rows.append(row)
                 report["matches"].append((watch, m, url))
     return new_rows
@@ -196,10 +246,12 @@ def main(argv=None) -> int:
     ap.add_argument("--from-dir", type=Path, help="read page text from local files named <id>.html/.txt/.pdf")
     ap.add_argument("--no-geocode", action="store_true")
     ap.add_argument("--only", help="check just this professor id (used when someone adds a professor on the website)")
+    ap.add_argument("--conference", help="check just this conference series id from data/conferences.json, for every professor")
     args = ap.parse_args(argv)
 
     watchlist = yaml.safe_load(WATCHLIST.read_text(encoding="utf-8")) or {}
     tracker = load_json(TRACKER, {"profs": [], "apps": []})
+    series_list = load_json(SERIES, [])
     hashes = load_json(HASHES, {})
     report = {"matches": [], "page_changes": []}
     errors: list[str] = []
@@ -216,8 +268,13 @@ def main(argv=None) -> int:
     if args.only and not any(p["id"] == args.only for p in tracker["profs"]):
         print(f"professor {args.only!r} not found in tracker.json")
         return 1
-    new_rows = check_conferences(watchlist, tracker, getter, report, errors, only=args.only)
-    if not args.only:
+    if args.conference and not any(x["id"] == args.conference for x in series_list):
+        print(f"conference {args.conference!r} not found in conferences.json")
+        return 1
+    editions: dict = {}
+    entries = build_entries(watchlist, series_list, only_series=args.conference)
+    new_rows = check_conferences(entries, tracker, getter, report, errors, only=args.only, editions_out=editions)
+    if not args.only and not args.conference:
         check_prof_pages(watchlist, getter, hashes, report, errors)
     profs_by_id = {p["id"]: p for p in tracker["profs"]}
     write_report(report, errors, new_rows, profs_by_id)
@@ -236,7 +293,16 @@ def main(argv=None) -> int:
                 p["lastCheckErrors"] = len(errors)
     if new_rows or args.only:
         save_json(TRACKER, tracker)
-    if not args.only:
+    if not args.only and editions:
+        now = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        for srs in series_list:
+            if srs["id"] in editions:
+                srs["editions"] = editions[srs["id"]]
+                srs["lastChecked"] = now
+                srs["lastCheckHits"] = sum(1 for r in new_rows if r.get("series") == srs["id"])
+                srs["lastCheckErrors"] = [p for e in editions[srs["id"]].values() for p in e.get("problems", [])][:10]
+        save_json(SERIES, series_list)
+    if not args.only and not args.conference:
         save_json(HASHES, hashes)
         save_json(STATUS, {"unreadable_pages": sorted(e.split(" (")[0] for e in errors)})
     build_outputs.main(geocode=not args.no_geocode and not args.from_dir)

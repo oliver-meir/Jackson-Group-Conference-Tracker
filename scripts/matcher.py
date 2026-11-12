@@ -126,6 +126,8 @@ def guess_role(norm_text: str, start: int, end: int) -> str:
                 d = (ks - end) * 1.5
             else:
                 d = 0
+            if role == "Session chair" and d > 30:
+                continue  # "Chair" usually labels the neighbouring name, so only count it right next to this one
             if d < ROLE_WINDOW:
                 cands.append((d, order, role))
     if not cands:
