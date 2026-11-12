@@ -649,7 +649,7 @@ window.TRACKER_DATA = {
    "city": "Philadelphia",
    "country": "USA",
    "role": "Invited talk",
-   "confidence": "Unverified",
+   "confidence": "Confirmed",
    "sourceUrl": "https://www.biophysics.org/2027meeting/program/scientific-sessions/symposia",
    "notes": "Auto-found 2026-11-12: ...- 12:45 PM Protein Ancestry and Adaptation Randy Stockbridge, University of Michigan, USA, Chair Banu Ozkan, Arizona State University, USA Nobuhiko Tokuriki, Michael Smith Laboratories, University of British Columbia,"
   }
