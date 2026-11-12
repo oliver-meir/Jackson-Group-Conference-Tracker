@@ -2,5 +2,5 @@
 //   helperUrl: "https://conference-tracker-helper.your-name.workers.dev"
 // Leave it empty and the site works read-only, with edits saved only in your own browser.
 window.TRACKER_CONFIG = {
-  helperUrl: ""
+    helperUrl: "https://conference-tracker-helper.oliver-meir05.workers.dev"
 };
