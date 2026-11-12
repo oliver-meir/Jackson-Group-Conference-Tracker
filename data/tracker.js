@@ -208,6 +208,18 @@ window.TRACKER_DATA = {
    "lastChecked": "2026-11-12T03:16:49Z",
    "lastCheckHits": 1,
    "lastCheckErrors": 0
+  },
+  {
+   "id": "domitilla-del-vecchio",
+   "name": "Domitilla Del Vecchio",
+   "affiliation": "MIT",
+   "field": "",
+   "aliases": [],
+   "context": [
+    "MIT"
+   ],
+   "notes": "",
+   "checkRequested": "2026-11-12T04:11:20Z"
   }
  ],
  "apps": [
@@ -712,6 +724,10 @@ window.TRACKER_DATA = {
    -38.5418,
    143.9757
   ],
+  "Minneapolis|USA": [
+   44.9773,
+   -93.2655
+  ],
   "Nagoya|Japan": [
    35.1815,
    136.9066
@@ -755,10 +771,6 @@ window.TRACKER_DATA = {
   "Vienna|Austria": [
    48.2082,
    16.3738
-  ],
-  "Minneapolis|USA": [
-   44.9773,
-   -93.2655
   ]
  },
  "watch": [
