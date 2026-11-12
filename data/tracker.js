@@ -740,5 +740,152 @@ window.TRACKER_DATA = {
    48.2082,
    16.3738
   ]
- }
+ },
+ "watch": [
+  {
+   "id": "keystone-genome-eng-2027",
+   "conference": "Keystone Symposia: Precision Genome Engineering, From Laboratory to Clinic",
+   "start": "2027-01-01",
+   "end": "2027-01-04",
+   "city": "",
+   "country": "Location TBD",
+   "urls": [
+    "https://www.keystonesymposia.org/conferences/conference-listing/meeting/onpage-program/X22027"
+   ],
+   "enabled": false
+  },
+  {
+   "id": "pegs-ai-2027",
+   "conference": "PEGS AI 2027 (co-located with PepTalk)",
+   "start": "2027-01-19",
+   "end": "2027-01-21",
+   "city": "Carlsbad",
+   "country": "USA",
+   "urls": [
+    "https://www.pegsummit.com/pegs-ai/keynotes"
+   ],
+   "enabled": true
+  },
+  {
+   "id": "bps-2027",
+   "conference": "Biophysical Society 71st Annual Meeting",
+   "start": "2027-02-20",
+   "end": "2027-02-24",
+   "city": "Philadelphia",
+   "country": "USA",
+   "urls": [
+    "https://www.biophysics.org/2027meeting/program/scientific-sessions/symposia"
+   ],
+   "enabled": true
+  },
+  {
+   "id": "tides-usa-2027",
+   "conference": "TIDES USA: Oligonucleotide and Peptide Therapeutics 2027",
+   "start": "2027-04-26",
+   "end": "2027-04-29",
+   "city": "Boston",
+   "country": "USA",
+   "urls": [
+    "https://informaconnect.com/TIDES/speakers/"
+   ],
+   "enabled": true
+  },
+  {
+   "id": "aps-2027",
+   "conference": "30th American Peptide Symposium",
+   "start": "2027-06-20",
+   "end": "2027-06-24",
+   "city": "Boston",
+   "country": "USA",
+   "urls": [
+    "https://www.americanpeptidesociety.org/"
+   ],
+   "enabled": false
+  },
+  {
+   "id": "protein-society-2027",
+   "conference": "Protein Society 41st Annual Symposium",
+   "start": "",
+   "end": "",
+   "city": "",
+   "country": "",
+   "urls": [
+    "https://ps.memberclicks.net/program"
+   ],
+   "enabled": false
+  },
+  {
+   "id": "australian-peptide-2027",
+   "conference": "17th Australian Peptide Conference",
+   "start": "2027-10-17",
+   "end": "2027-10-22",
+   "city": "Port Douglas",
+   "country": "Australia",
+   "urls": [
+    "https://ozpeptide.org/"
+   ],
+   "enabled": true
+  },
+  {
+   "id": "lorne-proteins-2027",
+   "conference": "52nd Lorne Proteins Conference 2027",
+   "start": "",
+   "end": "",
+   "city": "Lorne",
+   "country": "Australia",
+   "urls": [
+    "https://proteins-2027.p.asnevents.com.au/"
+   ],
+   "enabled": false
+  },
+  {
+   "id": "jps-2026",
+   "conference": "63rd Japanese Peptide Symposium",
+   "start": "",
+   "end": "",
+   "city": "",
+   "country": "Japan",
+   "urls": [
+    "https://www.peptide-soc.jp/63jps/en/special-program.html"
+   ],
+   "enabled": false
+  },
+  {
+   "id": "ps40-2026",
+   "conference": "Protein Society 40th Anniversary Symposium (PS40)",
+   "start": "2026-07-19",
+   "end": "2026-07-22",
+   "city": "Boston",
+   "country": "USA",
+   "urls": [
+    "https://ps.memberclicks.net/daily-program-ps40"
+   ],
+   "enabled": true
+  },
+  {
+   "id": "eps-2026",
+   "conference": "38th European Peptide Symposium (EPS 2026)",
+   "start": "2026-09-06",
+   "end": "2026-09-11",
+   "city": "Vienna",
+   "country": "Austria",
+   "urls": [
+    "https://airdrive.eventsair.com/eventsairwesteuprod/production-univie-public/a712793485d2416d95770e9aee840985"
+   ],
+   "enabled": true
+  },
+  {
+   "id": "jps-2025",
+   "conference": "62nd Japanese Peptide Symposium",
+   "start": "2025-10-21",
+   "end": "2025-10-23",
+   "city": "Fukuoka",
+   "country": "Japan",
+   "urls": [
+    "https://www.peptide-soc.jp/62jps/en/special-program.html"
+   ],
+   "enabled": true
+  }
+ ],
+ "conferences": []
 };
