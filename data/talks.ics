@@ -172,7 +172,7 @@ DTSTART;VALUE=DATE:20260615
 DTEND;VALUE=DATE:20260619
 SUMMARY:Hiroaki Suga at SEED 2026
 LOCATION:Denver\, USA
-DESCRIPTION:Keynote (Unverified). Auto-found 2026-11-12: ...Peyton Greenside\, BigHat Biosciences 9:15 AM 10:00 AM KEYNOTE: LassoGrafting of pseudo-cyclic peptide motifs to proteins for NeoBiologics\, Hiroaki Suga\, University of Tokyo\, Co-founder of Peptidream 10:00 AM 10:30 AM  Source: https://synbioconference.org/2026/technical-program
+DESCRIPTION:Keynote (Confirmed). Auto-found 2026-11-12: ...Peyton Greenside\, BigHat Biosciences 9:15 AM 10:00 AM KEYNOTE: LassoGrafting of pseudo-cyclic peptide motifs to proteins for NeoBiologics\, Hiroaki Suga\, University of Tokyo\, Co-founder of Peptidream 10:00 AM 10:30 AM  Source: https://synbioconference.org/2026/technical-program
 END:VEVENT
 BEGIN:VEVENT
 UID:icml26-bronstein@lab-conference-tracker
