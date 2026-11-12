@@ -238,6 +238,15 @@ LOCATION:London\, UK
 DESCRIPTION:Keynote (Confirmed). Keynote 3\, Precision Editing session\, 15 Oct. The Royal Institution Source: https://precision-medicine.conferences.nature.com/2026-agenda/precision-editing
 END:VEVENT
 BEGIN:VEVENT
+UID:seed-2026-hiroaki-suga@lab-conference-tracker
+DTSTAMP:20261108T000000Z
+DTSTART;VALUE=DATE:20261108
+DTEND;VALUE=DATE:20261113
+SUMMARY:Hiroaki Suga at SEED 2026
+LOCATION:Minneapolis\, USA
+DESCRIPTION:Keynote (Unverified). Auto-found 2026-11-12: ...Peyton Greenside\, BigHat Biosciences 9:15 AM 10:00 AM KEYNOTE: LassoGrafting of pseudo-cyclic peptide motifs to proteins for NeoBiologics\, Hiroaki Suga\, University of Tokyo\, Co-founder of Peptidream 10:00 AM 10:30 AM  (dates read from the page\, please check) Source: https://synbioconference.org/2026/technical-program
+END:VEVENT
+BEGIN:VEVENT
 UID:keystone27-liu@lab-conference-tracker
 DTSTAMP:20270101T000000Z
 DTSTART;VALUE=DATE:20270101
