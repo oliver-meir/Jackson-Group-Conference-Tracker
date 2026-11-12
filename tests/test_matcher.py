@@ -103,3 +103,51 @@ def test_end_to_end_with_fixture(tmp_path, monkeypatch):
     assert cw.main(["--from-dir", str(ROOT / "tests" / "fixtures")]) == 0
     data2 = json.loads((repo / "data" / "tracker.json").read_text())
     assert len(data2["apps"]) == len(data["apps"])
+
+
+def test_endowed_chair_is_not_session_chair():
+    m = find("Wilfred A. van der Donk, Richard E. Heckert Endowed Chair in Chemistry at Illinois", "wilfred-van-der-donk")
+    assert m and m.role != "Session chair"
+
+
+def _repo(tmp_path, monkeypatch, tracker=None):
+    import check_watchlist as cw
+    import build_outputs as bo
+    repo = tmp_path / "repo"
+    (repo / "data").mkdir(parents=True)
+    data = tracker or json.loads((ROOT / "data" / "tracker.json").read_text())
+    (repo / "data" / "tracker.json").write_text(json.dumps(data))
+    shutil.copy(ROOT / "data" / "geocache.json", repo / "data" / "geocache.json")
+    (repo / "watchlist.yaml").write_text(
+        "conferences:\n"
+        "  - id: demo-2027\n    conference: Demo Protein Meeting 2027\n    start: 2027-05-03\n"
+        "    end: 2027-05-06\n    city: Boston\n    country: USA\n    urls: [https://example.org/program]\n"
+        "prof_pages: []\n")
+    for name, val in {"ROOT": repo, "DATA": repo / "data", "TRACKER": repo / "data" / "tracker.json",
+                      "HASHES": repo / "data" / "page_hashes.json", "STATUS": repo / "data" / "check_status.json",
+                      "REPORT": repo / "report.md", "WATCHLIST": repo / "watchlist.yaml"}.items():
+        monkeypatch.setattr(cw, name, val)
+    monkeypatch.setattr(bo, "DATA", repo / "data")
+    return cw, repo
+
+
+def test_only_one_professor(tmp_path, monkeypatch):
+    cw, repo = _repo(tmp_path, monkeypatch)
+    assert cw.main(["--from-dir", str(ROOT / "tests" / "fixtures"), "--only", "shohei-koide"]) == 0
+    data = json.loads((repo / "data" / "tracker.json").read_text())
+    new = [a for a in data["apps"] if a.get("watchId") == "demo-2027"]
+    assert [a["profId"] for a in new] == ["shohei-koide"]
+    assert new[0]["check"] == "looks right"
+    koide = next(p for p in data["profs"] if p["id"] == "shohei-koide")
+    assert koide["lastChecked"].endswith("Z") and koide["lastCheckHits"] == 1
+    assert cw.main(["--from-dir", str(ROOT / "tests" / "fixtures"), "--only", "nobody"]) == 1
+
+
+def test_rejected_hits_are_not_suggested_again(tmp_path, monkeypatch):
+    data = json.loads((ROOT / "data" / "tracker.json").read_text())
+    data["rejected"] = ["demo-2027:jeffrey-gray"]
+    cw, repo = _repo(tmp_path, monkeypatch, data)
+    cw.main(["--from-dir", str(ROOT / "tests" / "fixtures")])
+    out = json.loads((repo / "data" / "tracker.json").read_text())
+    ids = {a["profId"] for a in out["apps"] if a.get("watchId") == "demo-2027"}
+    assert ids == {"shohei-koide", "luke-lavis"}

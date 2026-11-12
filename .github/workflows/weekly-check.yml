@@ -1,7 +1,6 @@
-# Every Monday morning (Canberra time) this reads the pages in watchlist.yaml,
-# looks for the tracked professors, and opens a pull request if it finds anything new.
-# Nothing reaches the website until someone reviews and merges that pull request.
-# No AI or paid service is used.
+# Every Monday morning (Canberra time) this reads the pages in watchlist.yaml, looks for every
+# tracked professor, and saves any new hits to the tracker as "Unverified".
+# Review them on the website with Confirm / Remove. No AI or paid service is used.
 name: Weekly conference check
 
 on:
@@ -11,36 +10,24 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
 
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip
-
       - name: Install
         run: pip install -r requirements.txt
-
       - name: Run tests
         run: pytest -q
-
       - name: Check conference pages
         run: python scripts/check_watchlist.py
-
-      - name: Open pull request with any new matches
-        uses: peter-evans/create-pull-request@v7
-        with:
-          branch: weekly-check
-          delete-branch: true
-          commit-message: "Weekly check: new possible conference appearances"
-          title: "Weekly check: new possible conference appearances"
-          body-path: report.md
-          add-paths: |
-            data/*
-          labels: weekly-check
+      - name: Show report
+        if: always()
+        run: cat report.md >> "$GITHUB_STEP_SUMMARY" || true
+      - name: Save results
+        run: bash scripts/save_results.sh "Weekly conference check results"

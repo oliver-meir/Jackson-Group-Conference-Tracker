@@ -1,5 +1,5 @@
-# When someone edits or uploads data/tracker.json (for example the file saved with the
-# website's "Export data" button), this rebuilds tracker.js, the calendar and the map
+# When data/tracker.json changes (a change saved from the website through the helper service,
+# or a file uploaded by hand), this rebuilds tracker.js, the calendar and the map
 # coordinates, and commits them. Nobody needs to run Python by hand.
 name: Rebuild website data
 
@@ -17,8 +17,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip
@@ -30,5 +30,12 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/tracker.js data/talks.ics data/geocache.json
-          git diff --cached --quiet || (git commit -m "Rebuild website data" && git push)
+          for attempt in 1 2 3; do
+            git add data/tracker.js data/talks.ics data/geocache.json
+            git diff --cached --quiet && exit 0
+            git commit -q -m "Rebuild website data"
+            git push -q origin HEAD:main && exit 0
+            git fetch -q origin main && git reset -q --hard origin/main
+            python scripts/build_outputs.py
+          done
+          exit 1

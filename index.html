@@ -101,7 +101,14 @@ main{padding:16px 20px;min-width:0;display:flex;flex-direction:column;gap:14px}
 .ev .cn{font-weight:500}
 .ev .loc{color:var(--muted);font-size:13px}
 .ev .meta{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;align-items:center;font-size:12.5px}
-.ev .ops{display:flex;gap:4px}
+.ev .ops{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.pill.flag-ok{background:var(--up-bg);color:var(--up)}
+.pill.flag-warn{background:var(--warn-bg);color:var(--warn)}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sp 0.9s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.addbox{display:flex;flex-direction:column;gap:6px}
+.addbox:empty{display:none}
+#jobs .banner{margin-bottom:6px}
 .confs{display:flex;flex-direction:column;gap:10px}
 .conf{border:1px solid var(--line);border-radius:6px;padding:10px 12px;display:grid;grid-template-columns:1fr auto;gap:6px 12px}
 .conf .cn{font-weight:600}
@@ -170,6 +177,7 @@ tr:last-child td{border-bottom:none}
 <div class="layout">
   <aside>
     <input id="pSearch" type="search" placeholder="Filter professors" aria-label="Filter professors">
+    <div class="addbox" id="addbox"></div>
     <ul class="plist" id="plist"></ul>
   </aside>
   <main>
@@ -189,9 +197,11 @@ tr:last-child td{border-bottom:none}
       </div>
       <select id="fCountry" aria-label="Country"><option value="">All countries</option></select>
       <input id="fText" type="search" placeholder="Search conference or city" aria-label="Search conference or city">
+      <label class="note" style="display:flex;gap:5px;align-items:center" for="fHide"><input type="checkbox" id="fHide"> Hide unverified</label>
       <span class="note" id="fCount"></span>
     </div>
     <div id="status"></div>
+    <div id="jobs"></div>
     <div id="view"></div>
   </main>
 </div>
@@ -201,28 +211,26 @@ tr:last-child td{border-bottom:none}
 
 <template id="aboutTpl"><div class="guide">
 <h2>What this is</h2>
-<p>A tracker of where our professors of interest have spoken or chaired at conferences, and where they are scheduled to appear. Every entry links to its source. Evidence levels: <strong>Confirmed</strong> (named in the official program), <strong>Reported</strong> (CV, lab site, news) or <strong>Unverified</strong> (found automatically, not yet checked). Plain attendance is rarely published, so the tracker covers speaking roles. Upcoming events show once a conference publishes its speakers, usually 3 to 9 months ahead.</p>
-
-<h2>How it stays up to date</h2>
-<p>Every Monday morning a GitHub Action reads the conference pages listed in <code>watchlist.yaml</code>, looks for each professor's name, and opens a pull request with anything new. No AI is involved, just name matching. The pull request lists each match with a text snippet and a "looks right" or "check carefully" flag. A lab member checks the links, fixes roles or dates, and merges. The website updates a minute later.</p>
-
-<h2>Common jobs</h2>
+<p>A tracker of where our professors of interest have spoken or chaired at conferences, and where they are scheduled to appear. Every entry links to its source. Evidence levels: <strong>Confirmed</strong> (checked by a lab member or named in the official program), <strong>Reported</strong> (CV, lab site, news) or <strong>Unverified</strong> (found automatically, not yet checked). Plain attendance is rarely published, so the tracker covers speaking roles. Upcoming events show once a conference publishes its speakers, usually 3 to 9 months ahead.</p>
+<h2>Adding a professor</h2>
+<p>Type their name in the box on the left. If they are not tracked yet, click <strong>Add and search</strong>, add their university, and submit. The tracker adds them, searches every conference program it knows about, and shows the hits here in about 2 to 3 minutes. From then on they are included in the weekly check every Monday morning. The first time you make a change on a browser you are asked for the lab passphrase.</p>
+<h2>Reviewing hits</h2>
+<p>New hits are marked <strong>Unverified</strong> with a flag: <em>Looks right</em> (full name found with their university nearby) or <em>Check carefully</em> (initials only, or no university nearby, so it may be someone with the same name). Read the snippet or open the source, then click <strong>Confirm</strong> or <strong>Remove</strong>. Removed hits are not suggested again. Tick <strong>Hide unverified</strong> to see only checked entries.</p>
+<h2>What it can and cannot find</h2>
+<p>It searches the conference program and speaker pages listed in the repository's <code>watchlist.yaml</code>, past and upcoming. It does not search the whole web, so talks at conferences that are not on the list will not be found. Adding a conference means adding its program link to <code>watchlist.yaml</code> on GitHub. No AI is used, just name matching.</p>
+<h2>Other features</h2>
 <ul>
-<li><strong>Review the weekly pull request:</strong> GitHub, Pull requests tab, open "Weekly check". Click each source link. To fix a row, use the pencil icon on <code>data/tracker.json</code> in the pull request. Merge when happy, or close it if every match is wrong.</li>
-<li><strong>Add a conference:</strong> edit <code>watchlist.yaml</code> on GitHub and copy an existing block. Point <code>urls</code> at the program or invited-speakers page.</li>
-<li><strong>Add or edit entries without code:</strong> make the change on this website, click <strong>Export data</strong>, then on GitHub open the <code>data</code> folder, Add file, Upload files, and upload <code>tracker.json</code>. The site rebuilds itself.</li>
-<li><strong>Check a speaker list by hand:</strong> paste a program into <strong>Check a speaker list</strong>. Matching runs in your browser.</li>
-<li><strong>Add a professor:</strong> use Add professor, fill in "other name forms" (initials, spelling variants), then Export and upload as above. To cut false matches for common names, add affiliation words as <code>context</code> in tracker.json.</li>
-<li><strong>Add a photo:</strong> upload a square image to the <code>photos</code> folder named after the professor's id, for example <code>photos/colin-jackson.jpg</code>. Without one, initials are shown. Use photos you have permission to use, such as ones the professor or their institution provides for this purpose.</li>
-<li><strong>Calendar:</strong> the Calendar button downloads all dated talks as an .ics file. On the hosted site you can subscribe to <code>data/talks.ics</code> in Outlook or Google Calendar so it stays current.</li>
+<li><strong>Check a speaker list:</strong> paste any program text to see which tracked professors are named in it, and save the matches.</li>
+<li><strong>Calendar:</strong> downloads all dated talks as an .ics file, or subscribe to <code>data/talks.ics</code> on this site in Outlook or Google Calendar.</li>
+<li><strong>Photos:</strong> add a square image to the repository's <code>photos</code> folder named after the professor's id, e.g. <code>photos/colin-jackson.jpg</code>. Use images you have permission to use.</li>
+<li><strong>Map:</strong> where each professor has been (faint) and is going (filled).</li>
 </ul>
-
 <h2>Built with</h2>
-<p>Python (requests, BeautifulSoup, pdfplumber, RapidFuzz, PyYAML), GitHub Actions with peter-evans/create-pull-request, Leaflet with OpenStreetMap tiles, and OpenStreetMap Nominatim for city coordinates. See README.md in the repository for setup and details.</p>
-</div>
-</template>
+<p>A static GitHub Pages site, GitHub Actions running Python (requests, BeautifulSoup, pdfplumber, RapidFuzz), a small Cloudflare Worker that saves changes, and Leaflet with OpenStreetMap. Setup and details are in README.md in the repository.</p>
+</div></template>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="data/tracker.js"></script>
+<script src="config.js"></script>
 <script>
 (function(){
   "use strict";
@@ -231,6 +239,8 @@ tr:last-child td{border-bottom:none}
   var CONF_HELP={Confirmed:"Named in the official program or speaker list",Reported:"From a CV, lab site, news item or social post",Unverified:"Likely but not yet sourced"};
   var state={profs:[],apps:[],sel:"",view:"overview",when:"all",country:"",text:"",sortKey:"start",sortDir:"desc",db:null,canWrite:true,loaded:false,sample:null};
   var TODAY=new Date().toISOString().slice(0,10);
+  var HELPER=String((window.TRACKER_CONFIG||{}).helperUrl||"").replace(/\/+$/,"");
+  var LIVE=!!HELPER;
   var $=function(id){return document.getElementById(id)};
   function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
   function slug(s){return String(s).toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,60)||("p"+Date.now())}
@@ -266,6 +276,7 @@ tr:last-child td{border-bottom:none}
       if(state.when==="up"&&!isUp(a))return false;
       if(state.when==="past"&&status(a)!=="past")return false;
       if(state.country&&a.country!==state.country)return false;
+      if(state.hideUnv&&(a.confidence||"Unverified")==="Unverified")return false;
       if(t&&((a.conference||"")+" "+(a.city||"")+" "+(a.country||"")+" "+profName(a.profId)).toLowerCase().indexOf(t)<0)return false;
       return true;
     });
@@ -289,6 +300,7 @@ tr:last-child td{border-bottom:none}
       html+='<li><button type="button" data-p="'+esc(p.id)+'" aria-current="'+(state.sel===p.id)+'"><span class="avc">'+avatar(p,28)+'</span><span class="nm">'+esc(p.name)+'</span><span class="af">'+esc(p.affiliation||"")+'</span><span class="ct" title="past / upcoming">'+(mine.length-up)+' / '+up+'</span></button></li>';
     });
     $("plist").innerHTML=html;
+    if(typeof renderAddBox==="function")renderAddBox();
   }
 
   function emptyState(){
@@ -307,8 +319,11 @@ tr:last-child td{border-bottom:none}
       '<span class="pill role">'+esc(a.role||"Unknown")+'</span>'+
       '<span class="pill conf-'+esc(a.confidence||"Unverified")+'" title="'+esc(CONF_HELP[a.confidence||"Unverified"]||"")+'">'+esc(a.confidence||"Unverified")+'</span>'+
       (a.sourceUrl?'<a href="'+esc(a.sourceUrl)+'" target="_blank" rel="noopener">Source</a>':'<span class="note">No source</span>')+
+      (a.check&&(a.confidence||"Unverified")==="Unverified"?'<span class="pill '+(/^looks right/.test(a.check)?"flag-ok":"flag-warn")+'" title="'+esc(a.check)+'">'+(/^looks right/.test(a.check)?"Looks right":"Check carefully")+'</span>':'')+
       (a.notes?'<span class="note">'+esc(a.notes)+'</span>':'')+
-      '</div></div><div class="ops">'+(state.canWrite?'<button class="btn small" type="button" data-edit="'+esc(a.id)+'">Edit</button>':'')+'</div></div>';
+      '</div></div><div class="ops">'+
+      (LIVE&&(a.confidence||"Unverified")==="Unverified"?'<button class="btn small" type="button" data-confirm="'+esc(a.id)+'">Confirm</button><button class="btn small" type="button" data-reject="'+esc(a.id)+'">Remove</button>':'')+
+      (state.canWrite?'<button class="btn small" type="button" data-edit="'+esc(a.id)+'">Edit</button>':'')+'</div></div>';
   }
 
   function renderOverview(list){
@@ -341,7 +356,7 @@ tr:last-child td{border-bottom:none}
     var past=list.filter(function(a){return status(a)==="past"}).sort(function(a,b){return sortKey(a)>sortKey(b)?-1:1});
     var tbc=list.filter(function(a){return status(a)==="tbc"});
     var h='<div class="tl">';
-    if(state.sel){var p=prof(state.sel);if(p)h+='<div class="who">'+avatar(p,72)+'<div><strong style="font-size:17px">'+esc(p.name)+'</strong><div class="note">'+esc(p.affiliation||"")+(p.field?" · "+esc(p.field):"")+'</div>'+(p.notes?'<div class="note">'+esc(p.notes)+'</div>':'')+(state.canWrite?' <button class="btn link" type="button" data-editp="'+esc(p.id)+'">Edit professor</button>':'')+'</div></div>'}
+    if(state.sel){var p=prof(state.sel);if(p)h+='<div class="who">'+avatar(p,72)+'<div><strong style="font-size:17px">'+esc(p.name)+'</strong><div class="note">'+esc(p.affiliation||"")+(p.field?" · "+esc(p.field):"")+'</div>'+(p.notes?'<div class="note">'+esc(p.notes)+'</div>':'')+(state.canWrite?' <button class="btn link" type="button" data-editp="'+esc(p.id)+'">Edit professor</button>':'')+(LIVE?' <button class="btn link" type="button" data-recheck="'+esc(p.id)+'">Search conferences again</button>':'')+(p.lastChecked?'<div class="note">Last searched '+esc(p.lastChecked.slice(0,16).replace("T"," "))+' UTC</div>':'')+'</div></div>'}
     if(state.when!=="past"){h+='<section><h2>Upcoming ('+ups.length+')</h2>'+(ups.length?ups.map(function(a){return evRow(a,show)}).join(""):'<div class="note">No upcoming appearances logged.</div>')+'</section>'}
     if(state.when==="all"&&tbc.length){h+='<section><h2>Date not confirmed ('+tbc.length+')</h2>'+tbc.map(function(a){return evRow(a,show)}).join("")+'</section>'}
     if(state.when!=="up"){
@@ -425,15 +440,19 @@ tr:last-child td{border-bottom:none}
 
   // events
   $("plist").addEventListener("click",function(e){var b=e.target.closest("[data-p]");if(!b)return;state.sel=b.dataset.p;if(state.sel&&state.view==="overview"){location.hash="timeline";return}render()});
-  $("pSearch").addEventListener("input",renderList);
+  $("pSearch").addEventListener("input",function(){renderList();renderAddBox()});
   document.querySelector(".filters").addEventListener("click",function(e){var b=e.target.closest("[data-when]");if(!b)return;state.when=b.dataset.when;render()});
   $("fCountry").addEventListener("change",function(e){state.country=e.target.value;render()});
   $("fText").addEventListener("input",function(e){state.text=e.target.value;render()});
+  $("fHide").addEventListener("change",function(e){state.hideUnv=e.target.checked;render()});
   $("view").addEventListener("click",function(e){
     var t;
     if((t=e.target.closest("[data-open]"))){state.sel=t.dataset.open;location.hash="timeline";return}
-    if((t=e.target.closest("[data-edit]"))){openApp(t.dataset.edit);return}
-    if((t=e.target.closest("[data-editp]"))){openProf(t.dataset.editp);return}
+    if((t=e.target.closest("[data-confirm]"))){review("confirm",t.dataset.confirm,t);return}
+    if((t=e.target.closest("[data-reject]"))){review("reject",t.dataset.reject,t);return}
+    if((t=e.target.closest("[data-recheck]"))){ensurePass(function(){startRecheck(t.dataset.recheck)});return}
+    if((t=e.target.closest("[data-edit]"))){var eid=t.dataset.edit;LIVE?ensurePass(function(){openApp(eid)}):openApp(eid);return}
+    if((t=e.target.closest("[data-editp]"))){var pid=t.dataset.editp;LIVE?ensurePass(function(){openProf(pid)}):openProf(pid);return}
     if((t=e.target.closest("[data-sort]"))){var k=t.dataset.sort;if(state.sortKey===k)state.sortDir=state.sortDir==="asc"?"desc":"asc";else{state.sortKey=k;state.sortDir="asc"}render()}
   });
 
@@ -460,7 +479,8 @@ tr:last-child td{border-bottom:none}
     if(id)$("pDel").onclick=async function(){
       var n=state.apps.filter(function(a){return a.profId===id}).length;
       if($("pDel").dataset.armed!=="1"){$("pDel").dataset.armed="1";$("pDel").textContent=n?"Delete with "+n+" appearances?":"Confirm delete";return}
-      try{for(var i=0;i<state.apps.length;i++){if(state.apps[i].profId===id)await state.db.doc("appearances/"+state.apps[i].id).delete()}
+      if(LIVE){try{await liveEdit([{op:"deleteProf",id:id}]);if(state.sel===id)state.sel="";closeDlg();toast("Professor deleted")}catch(err){$("pErr").textContent=err.message}return}
+      try{for(var i=state.apps.length-1;i>=0;i--){if(state.apps[i].profId===id)await state.db.doc("appearances/"+state.apps[i].id).delete()}
         await state.db.doc("profs/"+id).delete();if(state.sel===id)state.sel="";closeDlg();toast("Professor deleted")}catch(err){$("pErr").textContent=dbErr(err)}
     };
     $("pSave").onclick=async function(){
@@ -578,9 +598,110 @@ tr:last-child td{border-bottom:none}
     try{download("conference-appearances.csv",c,"text/csv");toast("CSV of the "+filtered().length+" shown rows downloaded")}
     catch(e){openDlg('<h2>Copy CSV</h2><p class="note" style="margin:0">Select all and copy.</p><div class="form"><label class="full" for="csvOut">CSV<textarea id="csvOut" style="min-height:240px">'+esc(c)+'</textarea></label></div><div class="row"><button class="btn" type="button" id="cClose">Close</button></div>');$("cClose").onclick=closeDlg}
   };
-  $("btnAddProf").onclick=function(){openProf()};
-  $("btnAddApp").onclick=function(){openApp()};
-  $("btnImport").onclick=openImport;
+  $("btnAddProf").onclick=function(){LIVE?ensurePass(function(){openAddSearch("")}):openProf()};
+  $("btnAddApp").onclick=function(){LIVE?ensurePass(function(){openApp()}):openApp()};
+  $("btnImport").onclick=function(){LIVE?ensurePass(openImport):openImport()};
+
+  // ---------- live mode: changes go through the helper service ----------
+  var PASSKEY="labConfTracker.pass",JOBKEY="labConfTracker.jobs";
+  function getPass(){try{return localStorage.getItem(PASSKEY)||state.pass||""}catch(e){return state.pass||""}}
+  function setPass(v){state.pass=v;try{v?localStorage.setItem(PASSKEY,v):localStorage.removeItem(PASSKEY)}catch(e){}}
+  function ensurePass(cb){
+    if(getPass()){cb();return}
+    openDlg('<h2>Lab passphrase</h2><p class="note" style="margin:0">Changes are saved for the whole lab, so they need the lab passphrase. You only enter it once on this browser.</p><form class="form" id="fpass"><label class="full" for="passIn">Passphrase<input id="passIn" type="password" autocomplete="current-password"></label></form><div class="err" id="passErr"></div><div class="row"><button class="btn" type="button" id="passCancel">Cancel</button><button class="btn primary" type="button" id="passOk">Continue</button></div>');
+    $("passCancel").onclick=closeDlg;
+    $("fpass").onsubmit=function(e){e.preventDefault();$("passOk").click()};
+    $("passOk").onclick=async function(){
+      var v=val("passIn");if(!v){$("passErr").textContent="Enter the passphrase.";return}
+      $("passOk").disabled=true;
+      try{var r=await fetch(HELPER+"/verify",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({passphrase:v})});
+        if(r.status===401){$("passErr").textContent="That passphrase is not right.";$("passOk").disabled=false;return}
+        if(!r.ok){var j={};try{j=await r.json()}catch(e){}throw new Error(j.error||("Helper said "+r.status))}
+        setPass(v);closeDlg();cb()}
+      catch(err){$("passOk").disabled=false;$("passErr").textContent="Could not reach the helper service: "+err.message}
+    };
+  }
+  async function helper(path,body){
+    var r;
+    try{r=await fetch(HELPER+path,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(Object.assign({passphrase:getPass()},body))})}
+    catch(e){throw new Error("Could not reach the helper service. Check your connection and try again.")}
+    var j={};try{j=await r.json()}catch(e){}
+    if(r.status===401){setPass("");throw new Error("The lab passphrase was not accepted. Try again.")}
+    if(!r.ok)throw new Error(j.error||("Helper said "+r.status));
+    return j;
+  }
+  async function liveEdit(ops){var res=await helper("/edit",{ops:ops});await refreshLive();return res}
+  async function refreshLive(){
+    try{var r=await fetch(HELPER+"/data",{cache:"no-store"});if(!r.ok)throw 0;var d=await r.json();load(d);state.liveOk=true;$("dataDate").textContent=d.generated?"· data updated "+d.generated:""}
+    catch(e){state.liveOk=false}
+    showBanner();render();checkJobs();
+  }
+  function review(op,id,btn){
+    ensurePass(async function(){
+      var a=state.apps.filter(function(x){return x.id===id})[0];
+      if(btn){btn.disabled=true;btn.textContent=op==="confirm"?"Saving...":"Removing..."}
+      try{await liveEdit([{op:op,id:id}]);toast(op==="confirm"?"Confirmed":"Removed. It will not be suggested again.")}
+      catch(err){toast(err.message);render()}
+    });
+  }
+  // add a professor and start the conference search
+  function openAddSearch(prefill){
+    openDlg('<h2>Add a professor and search conferences</h2><p class="note" style="margin:0">The tracker adds them, searches every conference program it knows about, and shows the hits here in about 2 to 3 minutes. They are also included in the weekly Monday check from now on.</p>'+
+      '<form class="form" id="fa2"><label class="full" for="nName">Full name<input id="nName" value="'+esc(prefill||"")+'" placeholder="e.g. Frances H. Arnold"></label>'+
+      '<label class="full" for="nAff">University or institute (helps tell apart people with the same name)<input id="nAff" placeholder="e.g. Caltech"></label>'+
+      '<label class="full" for="nAlias">Other ways their name is written (optional, comma separated)<input id="nAlias" placeholder="e.g. F. H. Arnold, Frances Arnold"></label>'+
+      '<label class="full" for="nField">Field (optional)<input id="nField" placeholder="e.g. directed evolution"></label></form>'+
+      '<div class="err" id="nErr"></div><div class="row"><button class="btn" type="button" id="nCancel">Cancel</button><button class="btn primary" type="button" id="nGo">Add and search</button></div>');
+    $("nCancel").onclick=closeDlg;
+    $("fa2").onsubmit=function(e){e.preventDefault();$("nGo").click()};
+    $("nGo").onclick=async function(){
+      var name=val("nName");if(name.length<3){$("nErr").textContent="Enter the professor's full name.";return}
+      $("nGo").disabled=true;$("nGo").innerHTML='<span class="spin"></span>Starting search';
+      try{
+        var res=await helper("/add-professor",{name:name,affiliation:val("nAff"),aliases:val("nAlias"),field:val("nField")});
+        addJob(res.id,name,res.requestedAt);closeDlg();$("pSearch").value="";
+        await refreshLive();state.sel=res.id;location.hash="timeline";render();
+      }catch(err){$("nGo").disabled=false;$("nGo").textContent="Add and search";$("nErr").textContent=err.message}
+    };
+  }
+  async function startRecheck(id){
+    try{var res=await helper("/recheck",{id:id});addJob(id,profName(id),res.requestedAt);renderJobs();toast("Search started")}catch(err){toast(err.message)}
+  }
+  function jobs(){try{return JSON.parse(localStorage.getItem(JOBKEY)||"[]")}catch(e){return state.jobs||[]}}
+  function saveJobs(j){state.jobs=j;try{localStorage.setItem(JOBKEY,JSON.stringify(j))}catch(e){}}
+  function addJob(id,name,at){var j=jobs().filter(function(x){return x.id!==id});j.push({id:id,name:name,at:at,started:Date.now()});saveJobs(j);renderJobs();pollSoon()}
+  function checkJobs(){
+    var j=jobs(),changed=false;
+    j.forEach(function(x){var p=prof(x.id);
+      if(!x.done&&p&&p.lastChecked&&p.lastChecked>=x.at){x.done=true;x.hits=p.lastCheckHits||0;x.errors=p.lastCheckErrors||0;changed=true}
+      if(!x.done&&Date.now()-x.started>15*60000&&!x.slow){x.slow=true;changed=true}
+      if(!p&&!x.done){x.gone=true}});
+    if(changed)saveJobs(j);renderJobs();
+    if(j.some(function(x){return !x.done&&!x.gone}))pollSoon();
+  }
+  var pollTimer=null;
+  function pollSoon(){if(pollTimer)return;pollTimer=setTimeout(function(){pollTimer=null;refreshLive()},20000)}
+  function renderJobs(){
+    if(!LIVE){$("jobs").innerHTML="";return}
+    var j=jobs().filter(function(x){return !x.gone});
+    $("jobs").innerHTML=j.map(function(x){
+      var mins=Math.max(0,Math.round((Date.now()-x.started)/60000));
+      if(x.done)return '<div class="banner">Search finished for <strong>'+esc(x.name)+'</strong>: '+(x.hits?x.hits+' new possible appearance'+(x.hits>1?'s':'')+'. Review them with Confirm or Remove.':'no new appearances on the conference programs the tracker knows about.')+(x.errors?' ('+x.errors+' page'+(x.errors>1?'s':'')+' could not be read.)':'')+' <button class="btn link" type="button" data-jobshow="'+esc(x.id)+'">Show</button> <button class="btn link" type="button" data-jobclose="'+esc(x.id)+'">Dismiss</button></div>';
+      if(x.slow)return '<div class="banner warn">The search for <strong>'+esc(x.name)+'</strong> is taking longer than usual. It may still finish; if not, check the Actions tab on GitHub. <button class="btn link" type="button" data-jobclose="'+esc(x.id)+'">Dismiss</button></div>';
+      return '<div class="banner"><span class="spin"></span>Searching conference programs for <strong>'+esc(x.name)+'</strong>. Started '+(mins?mins+' min ago':'just now')+', usually takes 2 to 3 minutes. You can keep using the site.</div>';
+    }).join("");
+  }
+  $("jobs").addEventListener("click",function(e){var t;
+    if((t=e.target.closest("[data-jobshow]"))){state.sel=t.dataset.jobshow;location.hash="timeline";render()}
+    if((t=e.target.closest("[data-jobclose]"))){saveJobs(jobs().filter(function(x){return x.id!==t.dataset.jobclose}));renderJobs()}
+  });
+  function renderAddBox(){
+    if(!LIVE){$("addbox").innerHTML="";return}
+    var q=$("pSearch").value.trim(),hit=q&&state.profs.some(function(p){return (p.name+" "+(p.affiliation||"")).toLowerCase().indexOf(q.toLowerCase())>=0});
+    $("addbox").innerHTML=(q&&!hit?'<div class="note">No tracked professor matches "'+esc(q)+'".</div>':'')+
+      '<button class="btn primary" type="button" id="btnAddSearch">'+(q&&!hit?'Add "'+esc(q.length>28?q.slice(0,28)+"...":q)+'" and search':'Add a professor and search')+'</button>';
+    $("btnAddSearch").onclick=function(){var v=$("pSearch").value.trim();ensurePass(function(){openAddSearch(hit?"":v)})};
+  }
 
   // data: data/tracker.js (built from data/tracker.json) + this browser's unsaved edits
   var LS="labConfTracker.edits.v1";
@@ -589,6 +710,7 @@ tr:last-child td{border-bottom:none}
   function showBanner(){
     var saved=state.savedAt?' Last change '+esc(state.savedAt.slice(0,10))+'.':'';
     if(!window.TRACKER_DATA){setStatus('<div class="banner warn">Could not load data/tracker.js. Keep index.html next to the data folder.</div>');return}
+    if(LIVE){setStatus(state.liveOk===false?'<div class="banner warn">Could not reach the helper service, so this shows the last published data and changes cannot be saved right now.</div>':"");return}
     if(state.stale)setStatus('<div class="banner warn">The lab data was updated after you made local edits, so this page shows the new lab data. <button class="btn link" type="button" id="bOld">Show my old edits</button> (then Export them and compare) or <button class="btn link" type="button" id="bReset">discard them</button>.</div>');
     else if(state.dirty)setStatus('<div class="banner warn">You have edits saved in this browser only.'+saved+' To share them: <strong>Export data</strong>, then upload the file to GitHub as data/tracker.json (see About). <button class="btn link" type="button" id="bReset">Discard my edits</button></div>');
     else setStatus("");
@@ -602,18 +724,27 @@ tr:last-child td{border-bottom:none}
       delete:async function(){var a=arr(),i=findIdx(a,id);if(i>=0)a.splice(i,1);state.savedAt=new Date().toISOString();persist();render()}}},
     collection:function(col){return{add:async function(b){var id="a"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);return state.db.doc(col+"/"+id).set(b)}}}
   };
+  if(LIVE){
+    state.db={
+      doc:function(path){var p=path.split("/"),col=p[0],id=p[1];return{
+        set:async function(b){if(col==="profs")return liveEdit([{op:"setProf",id:id,data:b}]);return liveEdit([{op:"setApp",id:id,data:b}])},
+        delete:async function(){return liveEdit([{op:col==="profs"?"deleteProf":"deleteApp",id:id}])}}},
+      collection:function(col){return{add:async function(b){return liveEdit([{op:"setApp",data:b}])}}}
+    };
+  }
   function load(d){state.profs=(d.profs||[]).map(function(x){return Object.assign({},x)});state.apps=(d.apps||[]).map(function(x){return Object.assign({},x)})}
   var SEED=window.TRACKER_DATA||{profs:[],apps:[],generated:"",geo:{}};
   var GEO=SEED.geo||{};
   function sig(d){return (d.generated||"")+"|"+(d.profs||[]).length+"|"+(d.apps||[]).length}
   load(SEED);
-  try{var raw=localStorage.getItem(LS);if(raw){var d=JSON.parse(raw);if(d&&d.profs&&d.apps){if(d.base===sig(SEED)){load(d);state.dirty=true;state.savedAt=d.savedAt||""}else{state.stale=true}}}}catch(e){}
+  if(!LIVE)try{var raw=localStorage.getItem(LS);if(raw){var d=JSON.parse(raw);if(d&&d.profs&&d.apps){if(d.base===sig(SEED)){load(d);state.dirty=true;state.savedAt=d.savedAt||""}else{state.stale=true}}}}catch(e){}
   $("dataDate").textContent=SEED.generated?"· data updated "+SEED.generated:"";
   state.loaded=true;
   function download(name,text,type){var blob=new Blob([text],{type:type});var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500)}
   $("btnExport").onclick=function(){download("tracker.json",JSON.stringify({generated:new Date().toISOString().slice(0,10),profs:state.profs,apps:state.apps},null,2)+"\n","application/json");toast("Data exported")};
   $("btnImportData").onclick=function(){$("fileIn").click()};
   $("fileIn").onchange=function(e){var f=e.target.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){try{var d=JSON.parse(rd.result);if(!d.profs||!d.apps)throw 0;load(d);state.savedAt=new Date().toISOString();persist();render();toast("Loaded "+d.apps.length+" appearances")}catch(err){toast("That file is not tracker data")}e.target.value=""};rd.readAsText(f)};
+  if(LIVE){$("btnImportData").style.display="none";$("btnExport").textContent="Download data";renderAddBox();renderJobs();refreshLive()}
   showBanner();
   route();
 })();

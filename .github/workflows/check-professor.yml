@@ -1,0 +1,33 @@
+# Runs straight away when someone adds a professor on the website (started by the helper
+# service), or by hand from the Actions tab. Checks every watchlist page for that one
+# professor and saves the hits as "Unverified".
+name: Check one professor
+
+on:
+  workflow_dispatch:
+    inputs:
+      prof_id:
+        description: "Professor id from data/tracker.json, e.g. colin-jackson"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: pip install -r requirements.txt
+      - name: Check conference pages for this professor
+        run: python scripts/check_watchlist.py --only "${{ inputs.prof_id }}"
+      - name: Show report
+        if: always()
+        run: cat report.md >> "$GITHUB_STEP_SUMMARY" || true
+      - name: Save results
+        run: bash scripts/save_results.sh "Check for ${{ inputs.prof_id }}" --only "${{ inputs.prof_id }}"

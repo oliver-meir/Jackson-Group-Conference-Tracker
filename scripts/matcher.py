@@ -23,7 +23,7 @@ PARTICLES = {"van", "der", "den", "de", "del", "della", "di", "da", "von", "le",
 ROLE_RULES = [
     ("Keynote", r"\bkeynote"),
     ("Plenary", r"\bplenary"),
-    ("Session chair", r"\b(session )?chair(s|ed|person)?\b"),
+    ("Session chair", r"\b(session )?chair(s|ed|person)?\b(?! (in|of)\b)"),  # not "Chair in Chemistry"
     ("Organiser", r"\borgani[sz](er|ers|ing committee)\b"),
     ("Panel", r"\bpanel(ist)?\b"),
     ("Poster", r"\bposter\b"),

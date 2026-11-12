@@ -5,7 +5,7 @@ Run locally:   python scripts/check_watchlist.py
 Dry run:       python scripts/check_watchlist.py --dry-run
 Offline test:  python scripts/check_watchlist.py --from-dir tests/fixtures  (reads <watch id>.html/.txt/.pdf)
 
-No LLM is used. Every new row is a suggestion for a person to review in the pull request.
+No LLM is used. Every new row is saved as "Unverified" for a lab member to Confirm or Remove on the website.
 """
 from __future__ import annotations
 
@@ -96,8 +96,9 @@ def already_logged(apps: list[dict], prof_id: str, watch: dict) -> bool:
     return False
 
 
-def check_conferences(watchlist, tracker, getter, report, errors):
-    profs = [p for p in tracker["profs"] if not p.get("paused")]
+def check_conferences(watchlist, tracker, getter, report, errors, only=None):
+    profs = [p for p in tracker["profs"] if not p.get("paused") and (only is None or p["id"] == only)]
+    rejected = set(tracker.get("rejected") or [])
     new_rows = []
     for watch in watchlist.get("conferences", []):
         if not watch.get("enabled", True):
@@ -114,7 +115,7 @@ def check_conferences(watchlist, tracker, getter, report, errors):
                 errors.append(f'{watch["id"]}: {url} returned almost no text (page may need a browser or has moved)')
                 continue
             for m in find_all(text, profs):
-                if m.prof_id in (watch.get("ignore") or []):
+                if m.prof_id in (watch.get("ignore") or []) or f'{watch["id"]}:{m.prof_id}' in rejected:
                     continue
                 if already_logged(tracker["apps"] + new_rows, m.prof_id, watch):
                     continue
@@ -129,6 +130,7 @@ def check_conferences(watchlist, tracker, getter, report, errors):
                     "country": watch.get("country", ""),
                     "role": m.role,
                     "confidence": "Unverified",
+                    "check": "looks right" if m.confident else f"check carefully: {m.reason}",
                     "sourceUrl": url,
                     "notes": f"Auto-found {dt.date.today().isoformat()}: {m.snippet[:220]}",
                 }
@@ -163,9 +165,8 @@ def check_prof_pages(watchlist, getter, hashes, report, errors):
 def write_report(report, errors, new_rows, profs_by_id):
     out = [f"# Weekly conference check, {dt.date.today().isoformat()}", ""]
     if new_rows:
-        out += [f"Found **{len(new_rows)} new possible appearance(s)**. They were added to `data/tracker.json` as *Unverified*.",
-                "", "Before merging: open each source link, fix the role or dates if needed, and change `confidence` to "
-                "`Confirmed` when the official program names them. Delete any row that is a different person.", ""]
+        out += [f"Found **{len(new_rows)} new possible appearance(s)**. They were added to the tracker as *Unverified*.",
+                "", "Review them on the website: Confirm the right ones, Remove the wrong ones.", ""]
         out += ["| Professor | Conference | Role guess | Check | Snippet |", "|---|---|---|---|---|"]
         for watch, m, url in report["matches"]:
             name = profs_by_id.get(m.prof_id, {}).get("name", m.prof_id)
@@ -194,6 +195,7 @@ def main(argv=None) -> int:
     ap.add_argument("--dry-run", action="store_true", help="do not write any files except report.md")
     ap.add_argument("--from-dir", type=Path, help="read page text from local files named <id>.html/.txt/.pdf")
     ap.add_argument("--no-geocode", action="store_true")
+    ap.add_argument("--only", help="check just this professor id (used when someone adds a professor on the website)")
     args = ap.parse_args(argv)
 
     watchlist = yaml.safe_load(WATCHLIST.read_text(encoding="utf-8")) or {}
@@ -211,8 +213,12 @@ def main(argv=None) -> int:
             time.sleep(1.5)  # be polite to conference sites
             return fetch_text(url, session)
 
-    new_rows = check_conferences(watchlist, tracker, getter, report, errors)
-    check_prof_pages(watchlist, getter, hashes, report, errors)
+    if args.only and not any(p["id"] == args.only for p in tracker["profs"]):
+        print(f"professor {args.only!r} not found in tracker.json")
+        return 1
+    new_rows = check_conferences(watchlist, tracker, getter, report, errors, only=args.only)
+    if not args.only:
+        check_prof_pages(watchlist, getter, hashes, report, errors)
     profs_by_id = {p["id"]: p for p in tracker["profs"]}
     write_report(report, errors, new_rows, profs_by_id)
 
@@ -222,9 +228,17 @@ def main(argv=None) -> int:
     if new_rows:
         tracker["apps"].extend(new_rows)
         tracker["generated"] = dt.date.today().isoformat()
+    if args.only:
+        for p in tracker["profs"]:
+            if p["id"] == args.only:
+                p["lastChecked"] = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+                p["lastCheckHits"] = len(new_rows)
+                p["lastCheckErrors"] = len(errors)
+    if new_rows or args.only:
         save_json(TRACKER, tracker)
-    save_json(HASHES, hashes)
-    save_json(STATUS, {"unreadable_pages": sorted(e.split(" (")[0] for e in errors)})
+    if not args.only:
+        save_json(HASHES, hashes)
+        save_json(STATUS, {"unreadable_pages": sorted(e.split(" (")[0] for e in errors)})
     build_outputs.main(geocode=not args.no_geocode and not args.from_dir)
     return 0
 

@@ -103,14 +103,13 @@ conferences:
     urls:
       - https://www.peptide-soc.jp/63jps/en/special-program.html
 
-  # ---- Past editions, kept as examples and for re-checks (already logged) ----
+  # ---- Past editions: kept on so newly added professors are checked against them too ----
   - id: ps40-2026
     conference: "Protein Society 40th Anniversary Symposium (PS40)"
     start: 2026-07-19
     end: 2026-07-22
     city: Boston
     country: USA
-    enabled: false
     urls:
       - https://ps.memberclicks.net/daily-program-ps40
 
@@ -120,7 +119,6 @@ conferences:
     end: 2026-09-11
     city: Vienna
     country: Austria
-    enabled: false
     urls:
       - https://airdrive.eventsair.com/eventsairwesteuprod/production-univie-public/a712793485d2416d95770e9aee840985
 
@@ -130,14 +128,13 @@ conferences:
     end: 2025-10-23
     city: Fukuoka
     country: Japan
-    enabled: false
     urls:
       - https://www.peptide-soc.jp/62jps/en/special-program.html
 
 
 # Professor pages to watch for changes (lab news, CV, "presentations" lists).
 # Nothing is added automatically: new lines that mention an event are listed in the
-# pull request for someone to look at. Add one entry per page.
+# weekly report (Actions tab) for someone to look at. Add one entry per page.
 prof_pages:
   - prof: hiroshi-murakami
     url: https://www.chembio.nagoya-u.ac.jp/labhp/bioanal2/en/presentations.html
