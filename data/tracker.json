@@ -16,7 +16,8 @@
         "ANU",
         "Australian National University",
         "Canberra"
-      ]
+      ],
+      "photoChecked": "2026-11-12"
     },
     {
       "id": "david-liu",
@@ -33,7 +34,13 @@
         "Harvard",
         "HHMI",
         "Howard Hughes"
-      ]
+      ],
+      "photo": "david-liu.jpg",
+      "photoAuto": true,
+      "photoSource": "https://commons.wikimedia.org/wiki/File:DavidRLiu2012.jpg",
+      "photoCredit": "ServiceAT, CC BY-SA 4.0 via Wikimedia Commons",
+      "photoWikidata": "Q16214492",
+      "photoChecked": "2026-11-12"
     },
     {
       "id": "carolyn-bertozzi",
@@ -48,7 +55,13 @@
       "context": [
         "Stanford",
         "HHMI"
-      ]
+      ],
+      "photo": "carolyn-bertozzi.jpg",
+      "photoAuto": true,
+      "photoSource": "https://commons.wikimedia.org/wiki/File:Carolyn_Bertozzi_IMG_9384.jpg",
+      "photoCredit": "Kuebi = Armin Kübelbeck, CC BY-SA 3.0 via Wikimedia Commons",
+      "photoWikidata": "Q7442",
+      "photoChecked": "2026-11-12"
     },
     {
       "id": "sergey-ovchinnikov",
@@ -63,7 +76,8 @@
       "context": [
         "MIT",
         "Massachusetts Institute"
-      ]
+      ],
+      "photoChecked": "2026-11-12"
     },
     {
       "id": "shohei-koide",
@@ -78,7 +92,8 @@
         "NYU",
         "New York University",
         "Langone"
-      ]
+      ],
+      "photoChecked": "2026-11-12"
     },
     {
       "id": "feng-zhang",
@@ -95,7 +110,8 @@
         "Massachusetts Institute",
         "McGovern",
         "HHMI"
-      ]
+      ],
+      "photoChecked": "2026-11-12"
     },
     {
       "id": "wilfred-van-der-donk",
@@ -113,7 +129,13 @@
         "Urbana",
         "UIUC",
         "HHMI"
-      ]
+      ],
+      "photo": "wilfred-van-der-donk.jpg",
+      "photoAuto": true,
+      "photoSource": "https://commons.wikimedia.org/wiki/File:2008_photo_WAV_2_cropped.jpg",
+      "photoCredit": "Wonkytonkgrrrl, CC BY-SA 4.0 via Wikimedia Commons",
+      "photoWikidata": "Q42054552",
+      "photoChecked": "2026-11-12"
     },
     {
       "id": "luke-lavis",
@@ -128,7 +150,8 @@
       "context": [
         "Janelia",
         "HHMI"
-      ]
+      ],
+      "photoChecked": "2026-11-12"
     },
     {
       "id": "jeffrey-gray",
@@ -145,7 +168,8 @@
         "Johns Hopkins",
         "JHU",
         "Rosetta"
-      ]
+      ],
+      "photoChecked": "2026-11-12"
     },
     {
       "id": "hiroaki-suga",
@@ -159,7 +183,8 @@
       "context": [
         "Tokyo",
         "PeptiDream"
-      ]
+      ],
+      "photoChecked": "2026-11-12"
     },
     {
       "id": "hiroshi-murakami",
@@ -172,7 +197,8 @@
       "notes": "",
       "context": [
         "Nagoya"
-      ]
+      ],
+      "photoChecked": "2026-11-12"
     },
     {
       "id": "alex-bronstein",
@@ -189,7 +215,8 @@
         "Technion",
         "ISTA",
         "Institute of Science and Technology"
-      ]
+      ],
+      "photoChecked": "2026-11-12"
     },
     {
       "id": "nobuhiko-tokuriki",
@@ -206,7 +233,8 @@
       "checkRequested": "2026-11-12T03:16:01Z",
       "lastChecked": "2026-11-12T03:16:49Z",
       "lastCheckHits": 1,
-      "lastCheckErrors": 0
+      "lastCheckErrors": 0,
+      "photoChecked": "2026-11-12"
     },
     {
       "id": "huimin-zhao",
@@ -223,7 +251,8 @@
       "checkRequested": "2026-11-12T04:59:07Z",
       "lastChecked": "2026-11-12T05:00:02Z",
       "lastCheckHits": 1,
-      "lastCheckErrors": 0
+      "lastCheckErrors": 0,
+      "photoChecked": "2026-11-12"
     }
   ],
   "apps": [

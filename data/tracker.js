@@ -17,7 +17,8 @@ window.TRACKER_DATA = {
     "ANU",
     "Australian National University",
     "Canberra"
-   ]
+   ],
+   "photoChecked": "2026-11-12"
   },
   {
    "id": "david-liu",
@@ -34,7 +35,13 @@ window.TRACKER_DATA = {
     "Harvard",
     "HHMI",
     "Howard Hughes"
-   ]
+   ],
+   "photo": "david-liu.jpg",
+   "photoAuto": true,
+   "photoSource": "https://commons.wikimedia.org/wiki/File:DavidRLiu2012.jpg",
+   "photoCredit": "ServiceAT, CC BY-SA 4.0 via Wikimedia Commons",
+   "photoWikidata": "Q16214492",
+   "photoChecked": "2026-11-12"
   },
   {
    "id": "carolyn-bertozzi",
@@ -49,7 +56,13 @@ window.TRACKER_DATA = {
    "context": [
     "Stanford",
     "HHMI"
-   ]
+   ],
+   "photo": "carolyn-bertozzi.jpg",
+   "photoAuto": true,
+   "photoSource": "https://commons.wikimedia.org/wiki/File:Carolyn_Bertozzi_IMG_9384.jpg",
+   "photoCredit": "Kuebi = Armin Kübelbeck, CC BY-SA 3.0 via Wikimedia Commons",
+   "photoWikidata": "Q7442",
+   "photoChecked": "2026-11-12"
   },
   {
    "id": "sergey-ovchinnikov",
@@ -64,7 +77,8 @@ window.TRACKER_DATA = {
    "context": [
     "MIT",
     "Massachusetts Institute"
-   ]
+   ],
+   "photoChecked": "2026-11-12"
   },
   {
    "id": "shohei-koide",
@@ -79,7 +93,8 @@ window.TRACKER_DATA = {
     "NYU",
     "New York University",
     "Langone"
-   ]
+   ],
+   "photoChecked": "2026-11-12"
   },
   {
    "id": "feng-zhang",
@@ -96,7 +111,8 @@ window.TRACKER_DATA = {
     "Massachusetts Institute",
     "McGovern",
     "HHMI"
-   ]
+   ],
+   "photoChecked": "2026-11-12"
   },
   {
    "id": "wilfred-van-der-donk",
@@ -114,7 +130,13 @@ window.TRACKER_DATA = {
     "Urbana",
     "UIUC",
     "HHMI"
-   ]
+   ],
+   "photo": "wilfred-van-der-donk.jpg",
+   "photoAuto": true,
+   "photoSource": "https://commons.wikimedia.org/wiki/File:2008_photo_WAV_2_cropped.jpg",
+   "photoCredit": "Wonkytonkgrrrl, CC BY-SA 4.0 via Wikimedia Commons",
+   "photoWikidata": "Q42054552",
+   "photoChecked": "2026-11-12"
   },
   {
    "id": "luke-lavis",
@@ -129,7 +151,8 @@ window.TRACKER_DATA = {
    "context": [
     "Janelia",
     "HHMI"
-   ]
+   ],
+   "photoChecked": "2026-11-12"
   },
   {
    "id": "jeffrey-gray",
@@ -146,7 +169,8 @@ window.TRACKER_DATA = {
     "Johns Hopkins",
     "JHU",
     "Rosetta"
-   ]
+   ],
+   "photoChecked": "2026-11-12"
   },
   {
    "id": "hiroaki-suga",
@@ -160,7 +184,8 @@ window.TRACKER_DATA = {
    "context": [
     "Tokyo",
     "PeptiDream"
-   ]
+   ],
+   "photoChecked": "2026-11-12"
   },
   {
    "id": "hiroshi-murakami",
@@ -173,7 +198,8 @@ window.TRACKER_DATA = {
    "notes": "",
    "context": [
     "Nagoya"
-   ]
+   ],
+   "photoChecked": "2026-11-12"
   },
   {
    "id": "alex-bronstein",
@@ -190,7 +216,8 @@ window.TRACKER_DATA = {
     "Technion",
     "ISTA",
     "Institute of Science and Technology"
-   ]
+   ],
+   "photoChecked": "2026-11-12"
   },
   {
    "id": "nobuhiko-tokuriki",
@@ -207,7 +234,8 @@ window.TRACKER_DATA = {
    "checkRequested": "2026-11-12T03:16:01Z",
    "lastChecked": "2026-11-12T03:16:49Z",
    "lastCheckHits": 1,
-   "lastCheckErrors": 0
+   "lastCheckErrors": 0,
+   "photoChecked": "2026-11-12"
   },
   {
    "id": "huimin-zhao",
@@ -224,7 +252,8 @@ window.TRACKER_DATA = {
    "checkRequested": "2026-11-12T04:59:07Z",
    "lastChecked": "2026-11-12T05:00:02Z",
    "lastCheckHits": 1,
-   "lastCheckErrors": 0
+   "lastCheckErrors": 0,
+   "photoChecked": "2026-11-12"
   }
  ],
  "apps": [
@@ -986,7 +1015,7 @@ window.TRACKER_DATA = {
      ]
     }
    },
-   "lastChecked": "2026-11-12T04:52:04Z",
+   "lastChecked": "2026-11-12T05:18:08Z",
    "lastCheckHits": 0,
    "lastCheckErrors": []
   }
