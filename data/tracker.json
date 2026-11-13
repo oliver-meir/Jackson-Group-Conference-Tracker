@@ -296,11 +296,16 @@
       ],
       "notes": "",
       "checkRequested": "2026-11-13T03:50:40Z",
-      "lastChecked": "2026-11-13T03:49:59Z",
+      "lastChecked": "2026-11-13T03:51:34Z",
       "lastCheckHits": 0,
       "lastCheckErrors": 0,
       "photoChecked": "2026-11-13",
-      "photoRules": 2
+      "photoRules": 2,
+      "photo": "deborah-marks.jpg",
+      "photoAuto": true,
+      "photoSource": "https://commons.wikimedia.org/wiki/File:Debora_Marks-ISMB2016.jpg",
+      "photoCredit": "ismb, CC BY 2.0 via Wikimedia Commons",
+      "photoWikidata": "Q23809228"
     }
   ],
   "apps": [
