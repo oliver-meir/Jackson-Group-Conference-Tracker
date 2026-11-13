@@ -45,5 +45,17 @@
     "lastChecked": "2026-11-12T05:29:16Z",
     "lastCheckHits": 0,
     "lastCheckErrors": []
+  },
+  {
+    "id": "vaccinology-next-generation-advances-in-transforming-immunit",
+    "name": "Vaccinology: Next-Generation Advances in Transforming Immunity",
+    "urls": [
+      "https://www.keystonesymposia.org/conferences/conference-listing/meeting/n32027"
+    ],
+    "city": "",
+    "country": "",
+    "enabled": true,
+    "added": "2026-11-13",
+    "checkRequested": "2026-11-13T04:36:18Z"
   }
 ]
