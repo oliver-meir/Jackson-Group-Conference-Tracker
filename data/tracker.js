@@ -795,6 +795,22 @@ window.TRACKER_DATA = {
    "confidence": "Confirmed",
    "sourceUrl": "https://ps.memberclicks.net/daily-program-ps40",
    "notes": "Auto-found 2026-11-12: ...hapel Hill 8:35 - 9:05 a.m. Tobin Sosnick , University of Chicago | Structural Energetics as a Framework for Rationalizing Protein Function Rosemary Cater , University of Queensland | Structural & Molecular Basis of C"
+  },
+  {
+   "id": "vaccinology-next-generation-advances-in-transforming-immunit-page-deborah-marks",
+   "profId": "deborah-marks",
+   "watchId": "vaccinology-next-generation-advances-in-transforming-immunit-page",
+   "conference": "Vaccinology: Next-Generation Advances in Transforming Immunity",
+   "startDate": "2027-05-16",
+   "endDate": "2027-05-19",
+   "city": "Vancouver",
+   "country": "Canada",
+   "role": "Unknown",
+   "confidence": "Unverified",
+   "check": "looks right",
+   "sourceUrl": "https://www.keystonesymposia.org/conferences/conference-listing/meeting/n32027",
+   "notes": "Auto-found 2026-11-13: ...hodes Scholar and completed his D.Phil. at Oxford University, where he developed adenoviral vectored vaccines for malaria and tuberculosis. Debora Marks, PhD Harvard Medical School Debora Marks, Ph.D., is a Professor  (dates read from the page, please check)",
+   "series": "vaccinology-next-generation-advances-in-transforming-immunit"
   }
  ],
  "rejected": [],
@@ -1084,6 +1100,33 @@ window.TRACKER_DATA = {
    },
    "lastChecked": "2026-11-12T05:29:16Z",
    "lastCheckHits": 0,
+   "lastCheckErrors": []
+  },
+  {
+   "id": "vaccinology-next-generation-advances-in-transforming-immunit",
+   "name": "Vaccinology: Next-Generation Advances in Transforming Immunity",
+   "urls": [
+    "https://www.keystonesymposia.org/conferences/conference-listing/meeting/n32027"
+   ],
+   "city": "",
+   "country": "",
+   "enabled": true,
+   "added": "2026-11-13",
+   "checkRequested": "2026-11-13T04:36:27Z",
+   "editions": {
+    "page": {
+     "status": "found",
+     "start": "2027-05-16",
+     "end": "2027-05-19",
+     "city": "Vancouver",
+     "country": "Canada",
+     "urls": [
+      "https://www.keystonesymposia.org/conferences/conference-listing/meeting/n32027"
+     ]
+    }
+   },
+   "lastChecked": "2026-11-13T04:36:41Z",
+   "lastCheckHits": 1,
    "lastCheckErrors": []
   }
  ]

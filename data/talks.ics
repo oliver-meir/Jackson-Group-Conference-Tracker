@@ -318,4 +318,13 @@ SUMMARY:Hiroaki Suga at TIDES Asia: Oligonucleotide and Peptide Therapeutics 202
 LOCATION:Tokyo\, Japan
 DESCRIPTION:Invited talk (Confirmed). Grand Nikko Tokyo Daiba Source: https://informaconnect.com/asia-tides/speakers/hiroaki-suga-phd/
 END:VEVENT
+BEGIN:VEVENT
+UID:vaccinology-next-generation-advances-in-transforming-immunit-page-deborah-marks@lab-conference-tracker
+DTSTAMP:20270516T000000Z
+DTSTART;VALUE=DATE:20270516
+DTEND;VALUE=DATE:20270520
+SUMMARY:Debora Marks at Vaccinology: Next-Generation Advances in Transforming Immunity
+LOCATION:Vancouver\, Canada
+DESCRIPTION:Unknown (Unverified). Auto-found 2026-11-13: ...hodes Scholar and completed his D.Phil. at Oxford University\, where he developed adenoviral vectored vaccines for malaria and tuberculosis. Debora Marks\, PhD Harvard Medical School Debora Marks\, Ph.D.\, is a Professor  (dates read from the page\, please check) Source: https://www.keystonesymposia.org/conferences/conference-listing/meeting/n32027
+END:VEVENT
 END:VCALENDAR

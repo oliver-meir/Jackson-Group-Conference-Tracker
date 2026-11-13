@@ -56,6 +56,21 @@
     "country": "",
     "enabled": true,
     "added": "2026-11-13",
-    "checkRequested": "2026-11-13T04:36:27Z"
+    "checkRequested": "2026-11-13T04:36:27Z",
+    "editions": {
+      "page": {
+        "status": "found",
+        "start": "2027-05-16",
+        "end": "2027-05-19",
+        "city": "Vancouver",
+        "country": "Canada",
+        "urls": [
+          "https://www.keystonesymposia.org/conferences/conference-listing/meeting/n32027"
+        ]
+      }
+    },
+    "lastChecked": "2026-11-13T04:36:41Z",
+    "lastCheckHits": 1,
+    "lastCheckErrors": []
   }
 ]
