@@ -296,7 +296,12 @@ window.TRACKER_DATA = {
     "Harvard"
    ],
    "notes": "",
-   "checkRequested": "2026-11-13T03:49:00Z"
+   "checkRequested": "2026-11-13T03:49:00Z",
+   "lastChecked": "2026-11-13T03:49:59Z",
+   "lastCheckHits": 0,
+   "lastCheckErrors": 0,
+   "photoChecked": "2026-11-13",
+   "photoRules": 2
   }
  ],
  "apps": [
