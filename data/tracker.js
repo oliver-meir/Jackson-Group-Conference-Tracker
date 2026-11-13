@@ -288,7 +288,7 @@ window.TRACKER_DATA = {
   },
   {
    "id": "deborah-marks",
-   "name": "Deborah Marks",
+   "name": "Debora Marks",
    "affiliation": "Harvard",
    "field": "",
    "aliases": [],
@@ -296,7 +296,7 @@ window.TRACKER_DATA = {
     "Harvard"
    ],
    "notes": "",
-   "checkRequested": "2026-11-13T03:49:00Z",
+   "checkRequested": "2026-11-13T03:50:40Z",
    "lastChecked": "2026-11-13T03:49:59Z",
    "lastCheckHits": 0,
    "lastCheckErrors": 0,
