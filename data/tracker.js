@@ -806,8 +806,7 @@ window.TRACKER_DATA = {
    "city": "Vancouver",
    "country": "Canada",
    "role": "Unknown",
-   "confidence": "Unverified",
-   "check": "looks right",
+   "confidence": "Confirmed",
    "sourceUrl": "https://www.keystonesymposia.org/conferences/conference-listing/meeting/n32027",
    "notes": "Auto-found 2026-11-13: ...hodes Scholar and completed his D.Phil. at Oxford University, where he developed adenoviral vectored vaccines for malaria and tuberculosis. Debora Marks, PhD Harvard Medical School Debora Marks, Ph.D., is a Professor  (dates read from the page, please check)",
    "series": "vaccinology-next-generation-advances-in-transforming-immunit"
