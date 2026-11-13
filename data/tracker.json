@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-12",
+  "generated": "2026-11-13",
   "profs": [
     {
       "id": "colin-jackson",
@@ -284,6 +284,18 @@
       "lastCheckErrors": 0,
       "photoChecked": "2026-11-12",
       "photoRules": 2
+    },
+    {
+      "id": "deborah-marks",
+      "name": "Deborah Marks",
+      "affiliation": "Harvard",
+      "field": "",
+      "aliases": [],
+      "context": [
+        "Harvard"
+      ],
+      "notes": "",
+      "checkRequested": "2026-11-13T03:49:00Z"
     }
   ],
   "apps": [
