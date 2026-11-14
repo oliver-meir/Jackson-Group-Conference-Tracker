@@ -1127,54 +1127,6 @@ window.TRACKER_DATA = {
    "lastChecked": "2026-11-13T04:36:47Z",
    "lastCheckHits": 0,
    "lastCheckErrors": []
-  },
-  {
-   "id": "bioorganic-chemistry-grc",
-   "name": "Bioorganic Chemistry GRC",
-   "urls": [
-    "https://www.grc.org/bioorganic-chemistry-conference/{year}/"
-   ],
-   "city": "",
-   "country": "",
-   "enabled": true,
-   "added": "2026-11-14",
-   "checkRequested": "2026-11-14T08:56:24Z",
-   "editions": {
-    "2025": {
-     "status": "could not read",
-     "urls": [
-      "https://www.grc.org/bioorganic-chemistry-conference/2025/"
-     ],
-     "problems": [
-      "bioorganic-chemistry-grc-2025: https://www.grc.org/bioorganic-chemistry-conference/2025/ returned almost no text (page may need a browser or has moved)"
-     ]
-    },
-    "2026": {
-     "status": "could not read",
-     "urls": [
-      "https://www.grc.org/bioorganic-chemistry-conference/2026/"
-     ],
-     "problems": [
-      "bioorganic-chemistry-grc-2026: https://www.grc.org/bioorganic-chemistry-conference/2026/ returned almost no text (page may need a browser or has moved)"
-     ]
-    },
-    "2027": {
-     "status": "could not read",
-     "urls": [
-      "https://www.grc.org/bioorganic-chemistry-conference/2027/"
-     ],
-     "problems": [
-      "bioorganic-chemistry-grc-2027: https://www.grc.org/bioorganic-chemistry-conference/2027/ returned almost no text (page may need a browser or has moved)"
-     ]
-    }
-   },
-   "lastChecked": "2026-11-14T08:56:49Z",
-   "lastCheckHits": 0,
-   "lastCheckErrors": [
-    "bioorganic-chemistry-grc-2025: https://www.grc.org/bioorganic-chemistry-conference/2025/ returned almost no text (page may need a browser or has moved)",
-    "bioorganic-chemistry-grc-2026: https://www.grc.org/bioorganic-chemistry-conference/2026/ returned almost no text (page may need a browser or has moved)",
-    "bioorganic-chemistry-grc-2027: https://www.grc.org/bioorganic-chemistry-conference/2027/ returned almost no text (page may need a browser or has moved)"
-   ]
   }
  ]
 };
