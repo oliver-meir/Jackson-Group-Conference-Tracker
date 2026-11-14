@@ -1127,6 +1127,18 @@ window.TRACKER_DATA = {
    "lastChecked": "2026-11-13T04:36:47Z",
    "lastCheckHits": 0,
    "lastCheckErrors": []
+  },
+  {
+   "id": "bioorganic-chemistry-grc",
+   "name": "Bioorganic Chemistry GRC",
+   "urls": [
+    "https://www.grc.org/bioorganic-chemistry-conference/{year}/"
+   ],
+   "city": "",
+   "country": "",
+   "enabled": true,
+   "added": "2026-11-14",
+   "checkRequested": "2026-11-14T08:56:24Z"
   }
  ]
 };
